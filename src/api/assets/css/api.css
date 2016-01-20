@@ -1,0 +1,58 @@
+.response-info {
+    display        : inline-block;
+    vertical-align : middle;
+}
+
+.json, pre {
+    font-size   : 13px;
+    line-height : 1.42857143;
+    font-family : Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.json span {
+}
+
+.json > .list-json {
+    display : block;
+}
+
+.list-json {
+    margin     : 0 0 0 32px;
+    padding    : 0;
+    list-style : none;
+    position   : relative;
+}
+
+.list-json:before {
+    content  : '';
+    position : absolute;
+}
+
+.toggle-properties {
+    cursor   : pointer;
+    position : relative;
+    display  : inline;
+}
+
+.toggle-properties:before {
+    content       : '►';
+    position      : absolute;
+    top           : 1px;
+    left          : -10px;
+    padding-right : 10px;
+    font-size     : 10px;
+    color         : #555555;
+}
+
+.toggle-properties.open:before {
+    content : '▼';
+}
+
+.node-string {
+    margin-left : 32px;
+}
+
+.hljs {
+    padding          : 19px !important;
+    background-color : #f5f5f5 !important;
+}
