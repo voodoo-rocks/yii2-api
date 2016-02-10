@@ -36,14 +36,14 @@ $(document).ready(function () {
                 });
         })
 
-        .on('click', '.toggle-properties', function (event) {
+        .on('click', '.toggle-properties', function () {
             $(this)
                 .toggleClass('open')
                 .next('.list-json')
                 .slideToggle(100);
         })
 
-        .on('click', '.run-tests', function (event) {
+        .on('click', '.run-tests', function () {
             $('.testable').each(function () {
                 var $block = $(this);
 
@@ -65,7 +65,7 @@ $(document).ready(function () {
             return false
         })
 
-        .on('click', '.node-remover', function (event) {
+        .on('click', '.node-remover', function () {
             $(this).parent().nextUntil('br').each(function () {
                 $(this).remove();
             });

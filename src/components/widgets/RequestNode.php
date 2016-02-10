@@ -28,9 +28,8 @@ class RequestNode extends Widget
             'dataProvider' => new ArrayDataProvider([
                 'allModels' => $this->node
             ]),
-            'itemView'     => function ($model, $key, $index, $widget) {
+            'itemView'     => function ($model, $key) {
                 $key = !is_numeric($key) ? Html::tag('span', "\"{$key}\"") . ':' : null;
-
 
                 $optional = is_array($model) && (array_search('optional', $model) !== false);
                 $remover  = $this->generateRemover($optional);

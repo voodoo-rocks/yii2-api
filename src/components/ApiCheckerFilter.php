@@ -15,10 +15,12 @@ class ApiCheckerFilter extends ActionFilter
 {
     public function beforeAction($action)
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         if (Yii::$app->api->requiresKey) {
 
             /** @var \ArrayObject $this->owner->request */
             $apiKey = ArrayHelper::getValue($this->owner->request, 'key');
+            /** @noinspection PhpUndefinedFieldInspection */
             if (!$apiKey || !in_array($apiKey, \Yii::$app->api->keys)) {
 
                 throw new BadRequestHttpException('Missing or invalid API key');

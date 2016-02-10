@@ -23,7 +23,7 @@ list($instance) = Yii::$app->createController($route);
             </div>
 
             <div class="pull-right">
-                <?= Html::button('Call', [
+                <?= Html::button(null, [
                     'autocomplete' => 'off',
                     'class'        => 'btn btn-success btn-api-call',
                     'data'         => [

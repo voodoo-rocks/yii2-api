@@ -8,12 +8,13 @@ namespace vm\api\controllers;
 
 use vm\api\models\SdkPrepareForm;
 use yii\web\BadRequestHttpException;
+use yii\web\Controller;
 
 /**
  * Class AndroidController
  * @package vm\api\controllers
  */
-class AndroidController extends \yii\web\Controller
+class AndroidController extends Controller
 {
     /**
      * @var string
