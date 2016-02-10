@@ -8,12 +8,13 @@ namespace vm\api\controllers;
 
 use Yii;
 use yii\helpers\Inflector;
+use yii\web\Controller;
 
 /**
  * Class DocController
  * @package vm\api\controllers
  */
-class DocController extends \yii\web\Controller
+class DocController extends Controller
 {
     /**
      * @var string

@@ -45,6 +45,7 @@ class Api extends Component
      */
     public function getRandomKey()
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         return ArrayHelper::getValue(\Yii::$app->api->keys, array_rand(\Yii::$app->api->keys));
     }
 }

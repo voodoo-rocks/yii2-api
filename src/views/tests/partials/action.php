@@ -1,3 +1,8 @@
+<?php
+
+/** @var \yii\base\Action $actionInstance */
+?>
+
 <a href="#" class="list-group-item testable"
    data-url="<?= \yii\helpers\Url::to(['tests/run'], true) ?>"
    data-controller="<?= $actionInstance->controller->uniqueId; ?>"

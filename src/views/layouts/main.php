@@ -7,7 +7,11 @@ use yii\bootstrap\NavBar;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
-ModuleAssets::register($this) ?>
+ModuleAssets::register($this);
+
+/** @var string $content */
+?>
+
 <?php $this->beginPage(); ?>
 
 <!DOCTYPE html>
@@ -25,11 +29,14 @@ ModuleAssets::register($this) ?>
     <?php $this->head(); ?>
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/styles/default.min.css">
+    <!--suppress JSUnresolvedLibraryURL -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
+    <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
@@ -48,8 +55,10 @@ $items = ArrayHelper::getColumn(array_keys($modules), function ($module) {
     ];
 });
 
+/** @noinspection PhpUndefinedFieldInspection */
 NavBar::begin([
     'brandLabel'            => Yii::$app->name . ' ' . Yii::$app->api->version,
+    'brandUrl'              => ['overview/index'],
     'options'               => [
         'class' => 'navbar navbar-inverse navbar-fixed-top',
     ],
@@ -84,6 +93,7 @@ NavBar::end();
 <footer class="footer">
 </footer>
 
+<!--suppress JSUnresolvedLibraryURL -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
 <?php $this->endBody() ?>

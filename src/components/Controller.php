@@ -119,7 +119,9 @@ class Controller extends \yii\rest\Controller
                     ],
                 ];
             } else {
-                echo $exception->getMessage();
+                return [
+                    'exception' => $exception->getMessage()
+                ];
             }
         }
     }
@@ -134,6 +136,7 @@ class Controller extends \yii\rest\Controller
     {
         $result = parent::afterAction($action, $result);
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (Yii::$app->api->enableProfiling) {
             list($count, $time) = Yii::getLogger()->getDbProfiling();
 
@@ -156,6 +159,7 @@ class Controller extends \yii\rest\Controller
      */
     function beforeAction($action)
     {
+        /** @noinspection PhpUndefinedFieldInspection */
         if (Yii::$app->api->enableProfiling) {
             Yii::beginProfile($action->uniqueId);
         }
@@ -211,7 +215,9 @@ class Controller extends \yii\rest\Controller
                 $template = call_user_func($template);
             }
 
+            /** @noinspection PhpUndefinedFieldInspection */
             if (Yii::$app->api->requiresKey) {
+                /** @noinspection PhpUndefinedFieldInspection */
                 $template = ArrayHelper::merge(['key' => Yii::$app->api->randomKey], $template);
             }
 

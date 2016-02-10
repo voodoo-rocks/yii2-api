@@ -5,12 +5,13 @@
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 namespace vm\api\controllers;
+use yii\web\Controller;
 
 /**
  * Class OverviewController
  * @package vm\api\controllers
  */
-class OverviewController extends \yii\web\Controller
+class OverviewController extends Controller
 {
     /**
      * @var string

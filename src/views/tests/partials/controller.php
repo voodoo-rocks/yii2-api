@@ -1,3 +1,9 @@
+<?php
+
+/** @var string $module */
+/** @var string $controller */
+?>
+
 <div class="list-group">
     <a href="#" class="list-group-item disabled"><?= $controller ?></a>
 

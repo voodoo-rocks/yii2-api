@@ -44,6 +44,7 @@ class Module extends \yii\base\Module
             throw new Exception('API component is missing in the config file. Please add a component that is object of @vm\api\components\Api');
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (Yii::$app->api->enableDocs) {
             $this->controllerMap['doc'] = 'vm\api\controllers\DocController';
         }

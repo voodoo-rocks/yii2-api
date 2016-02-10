@@ -27,7 +27,7 @@
   },
   "require": {
     "php": ">=5.4.0",
-    "vm/yii2-core": "^2.2",
+    "voodoo-mobile/yii2-core": "^2.2",
     "yiisoft/yii2": "^2.0.6",
     "yiisoft/yii2-bootstrap": "^2.0.5",
     "2amigos/yii2-editable-widget": "^0.1.4"
@@ -37,7 +37,7 @@
   },
   "autoload": {
     "psr-4": {
-      "vm\\api\\": "src"
+      "vm\\api\\": "src/"
     }
   }
 }

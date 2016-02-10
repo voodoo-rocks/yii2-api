@@ -22,7 +22,7 @@ use yii\web\Controller;
         <span class="badge"><?= count($actions) ?></span>
     </a>
 
-    <div id="menu-<?= Inflector::slug($controller) ?>" class="collapse in" area-expanded="true">
+    <div id="menu-<?= Inflector::slug($controller) ?>" class="collapse in">
 
         <?php
         $route = substr(Url::to([$controller . '/index']), strlen(Url::base()) + 1);
