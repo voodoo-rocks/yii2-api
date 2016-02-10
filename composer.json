@@ -1,5 +1,5 @@
 {
-  "name": "vm/yii2-api",
+  "name": "voodoo-mobile/yii2-api",
   "description": "Json based API module for Yii2.",
   "type": "yii2-module",
   "keywords": [
