@@ -97,6 +97,14 @@ class Controller extends \yii\rest\Controller
                 ];
             }
 
+            if (ArrayHelper::getValue($rawData, ['request', 'header', 'unified'])) {
+                if (count($result) == 1) {
+                    $result = array_shift($result);
+                }
+
+                $result = ['data' => $result];
+            }
+
             Yii::$app->response->format = Response::FORMAT_JSON;
 
             return [
