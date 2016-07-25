@@ -24,6 +24,14 @@ class TokenAuth extends AuthMethod
     public $accessTokenPath = ['token', 'hash'];
 
     /**
+     * @inheritDoc
+     */
+    public function beforeAction($action)
+    {
+        return true;
+    }
+
+    /**
      * Authenticates the current user.
      *
      * @param \yii\web\User     $user
