@@ -15,6 +15,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\log\Logger;
 use yii\web\Response;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * Class Controller
@@ -86,6 +87,17 @@ class Controller extends \yii\rest\Controller
             // Getting the content of the request and transforms it to the structured data
             $rawData       = Json::decode(Yii::$app->request->rawBody);
             $this->rawData = new ArrayObject(ArrayHelper::getValue($rawData, 'request'));
+
+
+            $identity = $this->authenticate(
+                Yii::$app->user,
+                Yii::$app->request,
+                $this->response ? : Yii::$app->response
+            );
+
+            if ($identity === null) {
+                throw new UnauthorizedHttpException('You are requesting with an invalid credential.');
+            }
 
             // Execute the action
             $result = parent::runAction($id, $params);
