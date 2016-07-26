@@ -15,7 +15,6 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\log\Logger;
 use yii\web\Response;
-use yii\web\UnauthorizedHttpException;
 
 /**
  * Class Controller
@@ -85,19 +84,7 @@ class Controller extends \yii\rest\Controller
             }
 
             // Getting the content of the request and transforms it to the structured data
-            $rawData       = Json::decode(Yii::$app->request->rawBody);
-            $this->rawData = new ArrayObject(ArrayHelper::getValue($rawData, 'request'));
-
-
-            $identity = $this->authenticate(
-                Yii::$app->user,
-                Yii::$app->request,
-                $this->response ? : Yii::$app->response
-            );
-
-            if ($identity === null) {
-                throw new UnauthorizedHttpException('You are requesting with an invalid credential.');
-            }
+            $this->rawData = new ArrayObject(Json::decode(Yii::$app->request->rawBody));
 
             // Execute the action
             $result = parent::runAction($id, $params);
@@ -109,7 +96,7 @@ class Controller extends \yii\rest\Controller
                 ];
             }
 
-            if (ArrayHelper::getValue($rawData, ['request', 'header', 'unified'])) {
+            if (ArrayHelper::getValue($this->rawData, ['header', 'unified'])) {
                 if (count($result) == 1) {
                     $result = array_shift($result);
                 }
@@ -120,22 +107,18 @@ class Controller extends \yii\rest\Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
 
             return [
-                'response' => [
-                                  'result' => [
-                                      'succeeded' => true,
-                                  ],
-                              ] + $result,
-            ];
+                       'result' => [
+                           'succeeded' => true,
+                       ],
+                   ] + $result;
         } catch (\Exception $exception) {
             if (!$this->verbose) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
 
                 return [
-                    'response' => [
-                        'result' => [
-                            'succeeded' => false,
-                            'exception' => $this->prepareException($exception),
-                        ],
+                    'result' => [
+                        'succeeded' => false,
+                        'exception' => $this->prepareException($exception),
                     ],
                 ];
             } else {
@@ -211,7 +194,7 @@ class Controller extends \yii\rest\Controller
                 'debug' => [
                     'file'  => $exception->getFile(),
                     'line'  => $exception->getLine(),
-                    'trace' => $exception->getTraceAsString(),
+                    'trace' => explode(PHP_EOL, trim($exception->getTraceAsString()))
                 ],
             ]);
 
@@ -242,10 +225,6 @@ class Controller extends \yii\rest\Controller
             }
 
             throw new VerboseException($template);
-        } else {
-            if (!$this->rawData->isEmpty()) {
-                // $this->compare($this->rawData->getValues(), $template);
-            }
         }
     }
 
@@ -256,34 +235,5 @@ class Controller extends \yii\rest\Controller
     public function getRequest()
     {
         return $this->rawData;
-    }
-
-    /**
-     * Compare the template from checkInputParams and request
-     *
-     * @param $request
-     * @param $template
-     *
-     * @throws \vm\api\components\ParamsMismatchException
-     */
-    private function compare($request, $template)
-    {
-        if (is_array($template)) {
-            foreach ($template as $key => $value) {
-                // Check if optional
-                $optional = is_array($value) && in_array('optional', $value);
-                if ($optional) {
-                    $value = ArrayHelper::getValue($value, 'value');
-                }
-
-                // Check for value
-                if (!$optional && !array_key_exists($key, $request)) {
-                    throw new ParamsMismatchException('Missing parameter ' . $key);
-                }
-
-                // Compare internal value
-                $this->compare(ArrayHelper::getValue($request, $key), $value);
-            }
-        }
     }
 }

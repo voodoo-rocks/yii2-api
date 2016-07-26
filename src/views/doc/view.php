@@ -52,9 +52,7 @@ list($instance) = Yii::$app->createController($route);
                     $template = $instance->runAction($action, ['verbose' => true]);
 
                     echo RequestNode::widget([
-                        'node' => [
-                            'request' => $template,
-                        ],
+                        'node' => $template
                     ]);
                 }
                 ?>
