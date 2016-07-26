@@ -37,11 +37,11 @@ class TokenAuth extends AuthMethod
     public function authenticate($user, $request, $response)
     {
         $identity = true;
-        $json     = new ArrayObject(Json::decode($request->rawBody));
 
         /** @var ArrayObject $request */
         /** @noinspection PhpUndefinedFieldInspection */
-        $request = $json->request;
+        $request     = new ArrayObject(Json::decode($request->rawBody));
+
         if (is_a($request, 'vm\core\ArrayObject')
             && $request->has(ArrayHelper::getValue($this->accessTokenPath, 0))
         ) {
