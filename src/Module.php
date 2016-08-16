@@ -31,8 +31,11 @@ class Module extends \yii\base\Module
      */
     public function init()
     {
-        Yii::$app->user->logout();
-        Yii::$app->session->destroy();
+        if (!Yii::$app->user->isGuest) {
+            Yii::$app->user->logout();
+            Yii::$app->session->destroy();
+        }
+
         parent::init();
 
         if (!YII_DEBUG) {

@@ -35,7 +35,7 @@ class RequestNode extends Widget
                 $remover  = $this->generateRemover($optional);
 
                 if ($optional) {
-                    array_splice($model, array_search('optional', $model), 1);
+                    array_splice($model, intval(array_search('optional', $model)), 1);
                     $model = ArrayHelper::getValue($model, 'value', $model);
                 }
 
