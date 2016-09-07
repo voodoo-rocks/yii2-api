@@ -27,9 +27,9 @@
   },
   "require": {
     "php": ">=5.4.0",
-    "voodoo-mobile/yii2-core": "^2.2",
-    "yiisoft/yii2": "^2.0.6",
-    "yiisoft/yii2-bootstrap": "^2.0.5",
+    "voodoo-mobile/yii2-core": "~2.2",
+    "yiisoft/yii2": "~2.0",
+    "yiisoft/yii2-bootstrap": "~2.0",
     "2amigos/yii2-editable-widget": "^0.1.4"
   },
   "require-dev": {
