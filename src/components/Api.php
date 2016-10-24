@@ -4,14 +4,14 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
-namespace vm\api\components;
+namespace vr\api\components;
 
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class Api
- * @package vm\api\components
+ * @package vr\api\components
  */
 class Api extends Component
 {

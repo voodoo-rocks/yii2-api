@@ -4,15 +4,17 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
-namespace vm\api;
+namespace vr\api;
 
+use vr\api\components\Harvester;
 use Yii;
 use yii\base\Exception;
+use yii\web\Request;
 use yii\web\Response;
 
 /**
  * Class Module
- * @package vm\api
+ * @package vr\api
  */
 class Module extends \yii\base\Module
 {
@@ -20,42 +22,68 @@ class Module extends \yii\base\Module
      * @var array
      */
     public $controllerMap = [
-        'doc'      => 'vm\api\controllers\DocController',
-        'android'  => 'vm\api\controllers\AndroidController',
-        'tests'    => 'vm\api\controllers\TestsController',
-        'overview' => 'vm\api\controllers\OverviewController',
+        'doc'   => 'vr\api\controllers\DocController',
+        'tests' => 'vr\api\controllers\TestsController',
     ];
+
+    public $hiddenMode = false;
 
     /**
      * @throws Exception
      */
     public function init()
     {
-        Yii::$app->user->logout();
-        Yii::$app->session->destroy();
         parent::init();
+
+        if (\Yii::$app->user) {
+            \Yii::$app->user->enableSession = false;
+            \Yii::$app->user->loginUrl      = null;
+        }
 
         if (!YII_DEBUG) {
             $this->controllerMap = [];
         }
 
-        Yii::setAlias('@yii2vm', __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..');
+        Yii::setAlias('@yii2vr', __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..');
         Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
 
-        if (!Yii::$app->has('api')) {
-            throw new Exception('API component is missing in the config file. Please add a component that is object of @vm\api\components\Api');
-        }
-
         /** @noinspection PhpUndefinedFieldInspection */
-        if (Yii::$app->api->enableDocs) {
-            $this->controllerMap['doc'] = 'vm\api\controllers\DocController';
+        if (YII_DEBUG || (Yii::$app->has('api') && Yii::$app->api->enableDocs)) {
+            $this->controllerMap['doc'] = 'vr\api\controllers\DocController';
         }
 
-        Yii::$app->response->formatters = array_merge(
-            Yii::$app->response->formatters,
-            [
-                Response::FORMAT_JSON => '\vm\api\components\JsonResponseFormatter',
-            ]
-        );
+        $this->set('harvester', new Harvester());
+
+        Yii::$app->set('request', [
+            'class'   => Request::className(),
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ],
+        ]);
+
+        Yii::$app->set('response', [
+            'class'         => '\yii\web\Response',
+            'on beforeSend' => function ($event) {
+                $response = $event->sender;
+
+                if ($response->data !== null && is_array($response->data)) {
+                    $response->data       = [
+                        'success' => $response->isSuccessful,
+                        'data'    => $response->data,
+                    ];
+                    $response->statusCode = 200;
+                }
+            },
+            'formatters'    => [
+                Response::FORMAT_HTML => [
+                    'class' => 'yii\web\HtmlResponseFormatter',
+                ],
+                Response::FORMAT_JSON => [
+                    'class'         => 'yii\web\JsonResponseFormatter',
+                    'prettyPrint'   => YII_DEBUG, // use "pretty" output in debug mode
+                    'encodeOptions' => JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+                ],
+            ],
+        ]);
     }
 }

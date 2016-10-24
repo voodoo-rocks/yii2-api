@@ -4,7 +4,7 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
-namespace vm\api\components;
+namespace vr\api\components;
 
 use Yii;
 use yii\base\ActionFilter;

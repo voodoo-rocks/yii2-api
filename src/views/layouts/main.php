@@ -1,11 +1,11 @@
 <?php
-use vm\api\components\ModuleAssets;
-use vm\api\Module;
-use vm\core\Metadata;
+use vr\api\components\Harvester;
+use vr\api\components\ModuleAssets;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\web\View;
 
 ModuleAssets::register($this);
 
@@ -28,16 +28,6 @@ ModuleAssets::register($this);
 
     <?php $this->head(); ?>
 
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/styles/default.min.css">
-    <!--suppress JSUnresolvedLibraryURL -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <!--suppress JSUnresolvedLibraryURL -->
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <!--suppress JSUnresolvedLibraryURL -->
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
 
@@ -46,9 +36,11 @@ ModuleAssets::register($this);
 
 <?php
 
-$modules = (new Metadata())->getModulesOf(Module::className());
+/** @var View $this */
+/** @var Harvester $harvester */
+$harvester = Yii::$app->controller->module->get('harvester');
 
-$items = ArrayHelper::getColumn(array_keys($modules), function ($module) {
+$items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function ($module) {
     return [
         'label' => $module,
         'url'   => Url::to('@web/' . $module . '/doc/index'),
@@ -57,7 +49,7 @@ $items = ArrayHelper::getColumn(array_keys($modules), function ($module) {
 
 /** @noinspection PhpUndefinedFieldInspection */
 NavBar::begin([
-    'brandLabel'            => Yii::$app->name . ' ' . Yii::$app->api->version,
+    'brandLabel'            => Yii::$app->name . ' ' . ArrayHelper::getValue(Yii::$app->get('api', false), 'version'),
     'brandUrl'              => ['overview/index'],
     'options'               => [
         'class' => 'navbar navbar-inverse navbar-fixed-top',
@@ -71,15 +63,7 @@ echo Nav::widget([
     'options' => [
         'class' => 'nav navbar-nav',
     ],
-    'items'   => [
-        ['label' => 'Overview', 'url' => ['overview/index']],
-        [
-            'label' => 'Module: ' . Yii::$app->controller->module->uniqueId,
-            'url'   => '#',
-            'items' => $items,
-        ],
-        ['label' => 'Tests', 'url' => ['tests/index']],
-    ],
+    'items' => $items,
 ]);
 
 NavBar::end();

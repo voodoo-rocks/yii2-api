@@ -4,9 +4,9 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
-namespace vm\api\controllers;
+namespace vr\api\controllers;
 
-use vm\core\ArrayObject;
+use vr\core\ArrayObject;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -16,7 +16,7 @@ use yii\web\Controller;
 
 /**
  * Class TestsController
- * @package vm\api\controllers
+ * @package vr\api\controllers
  */
 class TestsController extends Controller
 {
