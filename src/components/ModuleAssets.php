@@ -4,13 +4,13 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
-namespace vm\api\components;
+namespace vr\api\components;
 
 use yii\web\AssetBundle;
 
 /**
  * Class ModuleAssets
- * @package vm\api\components
+ * @package vr\api\components
  */
 class ModuleAssets extends AssetBundle
 {

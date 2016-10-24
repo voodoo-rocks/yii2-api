@@ -1,43 +1,43 @@
 {
-  "name": "voodoo-mobile/yii2-api",
-  "description": "Json based API module for Yii2.",
-  "type": "yii2-module",
-  "keywords": [
-    "voodoo-mobile",
-    "yii",
-    "yii2",
-    "yii 2",
-    "module",
-    "api",
-    "json"
-  ],
-  "homepage": "https://github.com/voodoo-mobile/yii2-api",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Voodoo Mobile Ltd.",
-      "email": "public@voodoo-mobile.com",
-      "homepage": "https://voodoo.rocks",
-      "role": "Developer"
-    }
-  ],
-  "support": {
-    "issues": "https://github.com/voodoo-mobile/yii2-api/issues",
-    "source": "https://github.com/voodoo-mobile/yii2-api"
-  },
-  "require": {
-    "php": ">=5.4.0",
-    "voodoo-mobile/yii2-core": "^2.2",
-    "yiisoft/yii2": "^2.0.6",
-    "yiisoft/yii2-bootstrap": "^2.0.5",
-    "2amigos/yii2-editable-widget": "^0.1.4"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "4.*"
-  },
-  "autoload": {
-    "psr-4": {
-      "vm\\api\\": "src/"
-    }
-  }
+	"name": "voodoo-rocks/yii2-api",
+	"description": "RESTful API module for Yii2",
+	"type": "yii2-module",
+	"keywords": [
+		"voodoo-rocks",
+		"yii",
+		"yii2",
+		"yii 2",
+		"module",
+		"api",
+		"json",
+		"rest"
+	],
+	"homepage": "https://github.com/voodoo-rocks/yii2-api",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Voodoo Rocks Ltd.",
+			"email": "public@voodoo.rocks",
+			"homepage": "https://voodoo.rocks",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/voodoo-rocks/yii2-api/issues",
+		"source": "https://github.com/voodoo-rocks/yii2-api"
+	},
+	"require": {
+		"php": ">=5.4.0",
+		"yiisoft/yii2": "~2.0",
+		"yiisoft/yii2-bootstrap": "~2.0",
+		"2amigos/yii2-editable-widget": "^0.1.4"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "4.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"vr\\api\\": "src/"
+		}
+	}
 }

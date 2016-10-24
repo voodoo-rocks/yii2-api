@@ -4,29 +4,42 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
-namespace vm\api\controllers;
+namespace vr\api\controllers;
 
+use vr\api\components\Harvester;
 use Yii;
+use yii\base\Module;
 use yii\helpers\Inflector;
 use yii\web\Controller;
 
 /**
  * Class DocController
- * @package vm\api\controllers
+ * @package vr\api\controllers
  */
 class DocController extends Controller
 {
     /**
      * @var string
      */
-    public $layout = '@api/views/layouts/doc';
+    public $layout = '@api/views/layouts/main';
 
     /**
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex($route = null)
     {
-        return $this->render('@api/views/doc/index');
+        /** @var Harvester $harvester */
+        $harvester = Yii::$app->controller->module->get('harvester');
+
+        /** @var Module $module */
+        $module = \Yii::$app->controller->module;
+
+        $controllers = $harvester->getControllers($module);
+
+        return $this->render('@api/views/doc/index', [
+            'controllers' => $controllers,
+            'action'       => $route ? $harvester->findAction($module, $route) : null,
+        ]);
     }
 
     /**

@@ -4,8 +4,8 @@
 
     use yii\helpers\Html;
 
-    $metadata = new \vm\core\Metadata();
-    $modules  = $metadata->getModulesOf(\vm\api\Module::className());
+    $metadata = new \vr\core\Metadata();
+    $modules  = $metadata->getModulesOf(\vr\api\Module::className());
 
     foreach ($modules as $module => $moduleClass) {
         echo Html::tag('h1', $module, ['class' => 'page-header']);
