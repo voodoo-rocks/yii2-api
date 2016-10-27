@@ -19,6 +19,7 @@ $(document).ready(function () {
         $.ajax({
             url        : $(this).attr('data-url'),
             method     : 'post',
+            data       : $('#request-block').text(),
             contentType: 'application/json'
         })
             .success(function (data) { show(data, 'success');})

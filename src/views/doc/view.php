@@ -34,7 +34,8 @@ use yii\helpers\Url;
                             <?= $model->description ?>
                         </p>
 
-                        <pre><code class="json editable" contenteditable="true"><?= InputParamsView::widget([
+                        <pre><code class="json editable" contenteditable="true" id="request-block"><?=
+                                InputParamsView::widget([
                                     'params' => $model->getInputParams(),
                                 ]) ?></code></pre>
                     </div>

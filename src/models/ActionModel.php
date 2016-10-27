@@ -47,6 +47,7 @@ class ActionModel extends Model
      */
     public function getInputParams()
     {
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
         return $this->controllerModel->createInstance()->getActionParams($this->getId(), ['verbose']);
     }
 

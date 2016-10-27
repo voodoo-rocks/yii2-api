@@ -122,6 +122,7 @@ class Controller extends \yii\rest\Controller
 
         try {
             $action->runWithParams([]);
+
         } catch (VerboseException $exception) {
             return $exception->params;
         }

@@ -35,6 +35,6 @@ class InputParamsView extends Widget
      */
     public function run()
     {
-        return Json::encode($this->params, JSON_PRETTY_PRINT);
+        return $this->params ? Json::encode($this->params, JSON_PRETTY_PRINT) : '{}';
     }
 }
