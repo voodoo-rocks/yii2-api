@@ -1,12 +1,9 @@
 <?php
 
-use vr\api\components\widgets\ActionPanelView;
 use vr\api\components\widgets\ControllersListView;
-use vr\api\models\Controller;
+use vr\api\models\ControllerModel;
 
-/** @var Controller $model */
-/** @var Controller[] $controllers */
-
+/** @var ControllerModel[] $controllers */
 ?>
 
 <div class="row">
@@ -17,8 +14,10 @@ use vr\api\models\Controller;
     </div>
 
     <div class="col-sm-10">
-        <?= ActionPanelView::widget([
-            'model' => $action
-        ]) ?>
+        <div class="row">
+            <div class="col-sm-12">
+                Please choose an action on the left side
+            </div>
+        </div>
     </div>
 </div>

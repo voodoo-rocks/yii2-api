@@ -1,9 +1,9 @@
 <?php
-use vr\api\models\Controller;
+use vr\api\models\ControllerModel;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ListView;
 
-/** @var Controller $model */
+/** @var ControllerModel $model */
 ?>
 
 <div class="panel panel-default">
@@ -18,6 +18,10 @@ use yii\widgets\ListView;
         'options'      => [
             'class' => 'list-group',
             'tag'   => 'div',
+        ],
+        'itemOptions' => [
+            'tag' => null,
+            'class' => 'list-group-item'
         ],
         'itemView'     => 'action-list-item-view',
         'layout'       => '{items}',

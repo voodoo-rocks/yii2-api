@@ -9,6 +9,7 @@
 namespace vr\api\components;
 
 use yii\base\Object;
+use yii\helpers\ArrayHelper;
 
 class DocParser extends Object
 {
@@ -31,6 +32,6 @@ class DocParser extends Object
 
     public function getDescription()
     {
-        return trim(explode(PHP_EOL, $this->source)[1], " *");
+        return trim(ArrayHelper::getValue(explode(PHP_EOL, $this->source), 1), " *");
     }
 }

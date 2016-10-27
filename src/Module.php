@@ -6,6 +6,7 @@
  */
 namespace vr\api;
 
+use vr\api\components\ErrorHandler;
 use vr\api\components\Harvester;
 use Yii;
 use yii\base\Exception;
@@ -44,8 +45,8 @@ class Module extends \yii\base\Module
             $this->controllerMap = [];
         }
 
-        Yii::setAlias('@yii2vr', __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..');
         Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
+        Yii::setAlias('@vendor', __DIR__ . '/../vendor');
 
         /** @noinspection PhpUndefinedFieldInspection */
         if (YII_DEBUG || (Yii::$app->has('api') && Yii::$app->api->enableDocs)) {
@@ -55,6 +56,9 @@ class Module extends \yii\base\Module
         $this->set('harvester', new Harvester());
 
         Yii::$app->set('request', [
+            'enableCookieValidation' => false,
+            'enableCsrfValidation'   => false,
+
             'class'   => Request::className(),
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
@@ -66,22 +70,27 @@ class Module extends \yii\base\Module
             'on beforeSend' => function ($event) {
                 $response = $event->sender;
 
-                if ($response->data !== null && is_array($response->data)) {
-                    $response->data       = [
-                        'success' => $response->isSuccessful,
-                        'data'    => $response->data,
-                    ];
-                    $response->statusCode = 200;
+                if ($response->format == Response::FORMAT_JSON) {
+
+                    if ($response->isSuccessful) {
+                        $response->data = [
+                            'success' => $response->isSuccessful,
+                            'data'    => $response->data,
+                        ];
+                    } else {
+                        $response->data = [
+                            'success'   => $response->isSuccessful,
+                            'data'      => null,
+                            'exception' => $response->data,
+                        ];
+                    }
                 }
             },
             'formatters'    => [
-                Response::FORMAT_HTML => [
-                    'class' => 'yii\web\HtmlResponseFormatter',
-                ],
                 Response::FORMAT_JSON => [
                     'class'         => 'yii\web\JsonResponseFormatter',
                     'prettyPrint'   => YII_DEBUG, // use "pretty" output in debug mode
-                    'encodeOptions' => JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+                    'encodeOptions' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
                 ],
             ],
         ]);

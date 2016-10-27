@@ -8,7 +8,7 @@
 
 namespace vr\api\components;
 
-use vr\api\models\Controller;
+use vr\api\models\ControllerModel;
 use Yii;
 use yii\base\Component;
 use yii\base\Module;
@@ -60,7 +60,7 @@ class Harvester extends Component
      */
     public function findAction($module, $route)
     {
-        /** @var Controller $controller */
+        /** @var ControllerModel $controller */
         foreach ($this->getControllers($module) as $controller) {
             if ($action = $controller->findAction($route)) {
                 return $action;
@@ -83,7 +83,7 @@ class Harvester extends Component
             $class = pathinfo($file, PATHINFO_FILENAME);
             $route = Inflector::camel2id($class = substr($class, 0, strlen($class) - strlen('Controller')));
 
-            return new Controller([
+            return new ControllerModel([
                 'route' => $module->uniqueId . '/' . $route,
                 'label' => Inflector::camel2words($class),
             ]);

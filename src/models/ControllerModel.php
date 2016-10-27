@@ -3,7 +3,9 @@
 namespace vr\api\models;
 
 use ReflectionMethod;
+use vr\api\components\Controller;
 use vr\api\components\DocParser;
+use yii\base\Model;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
@@ -12,7 +14,7 @@ use yii\helpers\Inflector;
  * Class Controller
  * @package vr\api\models
  */
-class Controller extends \yii\base\Model
+class ControllerModel extends Model
 {
     /**
      * @var
@@ -30,31 +32,11 @@ class Controller extends \yii\base\Model
     public $description;
 
     /**
-     * @var \yii\rest\Controller
-     */
-    private $instance;
-
-    /**
      * @return null
      */
     public function init()
     {
-        parent::init();
-
-        return $this->createInstance();
-    }
-
-    /**
-     * @return null
-     */
-    public function createInstance()
-    {
-        /** @var \yii\web\Controller $instance */
-        list($this->instance, $success) = \Yii::$app->createController($this->route);
-
-        if (!$success) {
-            return null;
-        }
+        return parent::init();
     }
 
     /**
@@ -74,9 +56,21 @@ class Controller extends \yii\base\Model
         $this->createInstance();
     }
 
+    /**
+     * @return Controller
+     */
+    public function createInstance()
+    {
+        /** @var \yii\web\Controller $instance */
+        list($instance, $success) = \Yii::$app->createController($this->route);
+
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $instance;
+    }
+
     public function findAction($route)
     {
-        /** @var Action $action */
+        /** @var ActionModel $action */
         foreach ($this->getActions() as $action) {
             if ($action->route == $route) {
                 return $action;
@@ -91,23 +85,29 @@ class Controller extends \yii\base\Model
      */
     public function getActions()
     {
-        $reflection = new \ReflectionClass($this->instance);
+        $instance = $this->createInstance();
+
+        $reflection = new \ReflectionClass($instance);
 
         $actions = [];
 
         /** @var VerbFilter $filter */
-        $filter = ArrayHelper::getValue($this->instance->behaviors(), 'verbs');
+        $filter = ArrayHelper::getValue($instance->behaviors(), 'verbs');
 
         /** @var ReflectionMethod $method */
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             if ($route = $this->extractRoute($method)) {
-                $actions[] = new Action([
-                    'verbs'     => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
-                    'route'     => $this->route . '/' . $route,
-                    'docParser' => new DocParser([
-                        'source' => $method->getDocComment(),
-                    ]),
-                    'label'     => Inflector::camel2words($route),
+
+                $docParser = new DocParser([
+                    'source' => $method->getDocComment(),
+                ]);
+
+                $actions[] = new ActionModel([
+                    'controllerModel' => $this,
+                    'verbs'           => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
+                    'route'           => $this->route . '/' . $route,
+                    'description'     => $docParser->getDescription(),
+                    'label'           => Inflector::camel2words($route),
                 ]);
             }
         }

@@ -23,6 +23,9 @@ class ModuleAssets extends AssetBundle
      * @var array
      */
     public $js = [
+        '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js',
+        '//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js',
+        '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js',
         'js/api.js',
     ];
 
@@ -30,7 +33,7 @@ class ModuleAssets extends AssetBundle
      * @var array
      */
     public $css = [
-        'css/api.css',
+        '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/default.min.css',
     ];
 
     /**
