@@ -24,6 +24,8 @@ class DocController extends Controller
     public $layout = '@api/views/layouts/main';
 
     /**
+     * @param null $route
+     *
      * @return string
      */
     public function actionIndex($route = null)
@@ -36,9 +38,15 @@ class DocController extends Controller
 
         $controllers = $harvester->getControllers($module);
 
+        if ($route) {
+            return $this->render('@api/views/doc/view', [
+                'controllers' => $controllers,
+                'model'       => $harvester->findAction($module, $route),
+            ]);
+        }
+
         return $this->render('@api/views/doc/index', [
             'controllers' => $controllers,
-            'action'       => $route ? $harvester->findAction($module, $route) : null,
         ]);
     }
 
@@ -87,4 +95,5 @@ class DocController extends Controller
     public function actionEditable()
     {
     }
+
 }

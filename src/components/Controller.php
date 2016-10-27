@@ -7,11 +7,10 @@
 namespace vr\api\components;
 
 use Yii;
-use yii\filters\auth\QueryParamAuth;
+use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\log\Logger;
 use yii\web\BadRequestHttpException;
-use yii\web\Response;
 
 /**
  * Class Controller
@@ -20,18 +19,28 @@ use yii\web\Response;
 class Controller extends \yii\rest\Controller
 {
     /**
+     * @var bool
+     */
+    private $verbose = false;
+
+    /**
      * @return array
      */
     public function behaviors()
     {
         $filters = [
-            'apiChecker'    => [
+            'apiChecker' => [
                 'class' => ApiCheckerFilter::className(),
             ],
-            'authenticator' => [
-                'class' => QueryParamAuth::className()
+//            'authenticator' => [
+//                'class' => QueryParamAuth::className(),
+//            ],
+            'verbs'      => [
+                'class'   => VerbFilter::className(),
+                'actions' => [
+                    '*' => ['post'],
+                ],
             ],
-
         ];
 
         return array_merge(parent::behaviors(), $filters);
@@ -70,10 +79,8 @@ class Controller extends \yii\rest\Controller
      */
     function beforeAction($action)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
         /** @noinspection PhpUndefinedFieldInspection */
-        if (Yii::$app->has('api') && Yii::$app->api->enableProfiling) {
+        if (Yii::$app->has('api', true) && Yii::$app->api->enableProfiling) {
             Yii::beginProfile($action->uniqueId);
         }
 
@@ -84,6 +91,10 @@ class Controller extends \yii\rest\Controller
         return true;
     }
 
+    /**
+     * @return bool
+     * @throws BadRequestHttpException
+     */
     private function checkContentType()
     {
         $found = ArrayHelper::getValue(Yii::$app->get('request'),
@@ -94,6 +105,41 @@ class Controller extends \yii\rest\Controller
 
             throw new BadRequestHttpException('Incorrect content type. Following content types are acceptable: ' .
                                               implode(',', array_keys($acceptable)));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $action
+     *
+     * @return null|string
+     */
+    public function getActionParams($action)
+    {
+        $action        = $this->createAction($action);
+        $this->verbose = true;
+
+        try {
+            $action->runWithParams([]);
+        } catch (VerboseException $exception) {
+            return $exception->params;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $callable
+     *
+     * @return bool
+     * @throws VerboseException
+     */
+    protected function checkInputParams($callable)
+    {
+        if ($this->verbose) {
+            $params = call_user_func($callable);
+            throw new VerboseException($params);
         }
 
         return true;

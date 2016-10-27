@@ -1,9 +1,9 @@
 <?php
-use vr\api\models\Controller;
+use vr\api\models\ControllerModel;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ListView;
 
-/** @var Controller $model */
+/** @var ControllerModel $model */
 ?>
 
 <div class="panel panel-default">

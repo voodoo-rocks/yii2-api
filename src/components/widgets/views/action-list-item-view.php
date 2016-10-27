@@ -1,9 +1,9 @@
 <?php
 
-use vr\api\models\Action;
+use vr\api\models\ActionModel;
 use yii\helpers\Url;
 
-/** @var Action $model */
+/** @var ActionModel $model */
 
 ?>
 

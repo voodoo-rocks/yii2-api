@@ -27,8 +27,6 @@ ModuleAssets::register($this);
     <title><?= $this->title ?: Yii::$app->name; ?></title>
 
     <?php $this->head(); ?>
-
-    <![endif]-->
 </head>
 
 <body>
@@ -63,7 +61,7 @@ echo Nav::widget([
     'options' => [
         'class' => 'nav navbar-nav',
     ],
-    'items' => $items,
+    'items'   => $items,
 ]);
 
 NavBar::end();
@@ -76,9 +74,6 @@ NavBar::end();
 
 <footer class="footer">
 </footer>
-
-<!--suppress JSUnresolvedLibraryURL -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
 <?php $this->endBody() ?>
 </body>

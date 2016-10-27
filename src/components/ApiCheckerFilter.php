@@ -16,9 +16,9 @@ class ApiCheckerFilter extends ActionFilter
     public function beforeAction($action)
     {
         /** @noinspection PhpUndefinedFieldInspection */
-        if (Yii::$app->api->requiresKey) {
+        if (Yii::$app->has('api') && Yii::$app->api->requiresKey) {
 
-            /** @var \ArrayObject $this->owner->request */
+            /** @var \ArrayObject $this ->owner->request */
             $apiKey = ArrayHelper::getValue($this->owner->request, 'key');
             /** @noinspection PhpUndefinedFieldInspection */
             if (!$apiKey || !in_array($apiKey, \Yii::$app->api->keys)) {
