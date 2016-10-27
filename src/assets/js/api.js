@@ -31,4 +31,33 @@ $(document).ready(function () {
                 });
             });
     });
+
+    (function ($) {
+        $.fn.fireChangeEvents = function () {
+            return this.each(function () {
+                var $this = $(this);
+                var htmlOld = $this.html();
+                $this.bind('paste cut focus blur', function () {
+                    var htmlNew = $this.html();
+                    if (htmlOld !== htmlNew) {
+                        $this.trigger('change');
+                        htmlOld = htmlNew;
+                    }
+                })
+            })
+        }
+    })(jQuery);
+
+    $('.editable').fireChangeEvents().on('change', function () {
+
+        try {
+            $(this).text(JSON.stringify(JSON.parse($(this).text()), null, 4));
+        } catch (err) {
+
+        }
+
+        $(this).each(function (i, block) {
+            hljs.highlightBlock(block);
+        });
+    });
 });
