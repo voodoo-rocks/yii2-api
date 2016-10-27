@@ -26,7 +26,7 @@ use yii\helpers\Url;
                         <?= $model->route ?>
 
                         <button id="execute" class="btn btn-default pull-right btn-xs"
-                                data-url="<?= Url::to($model->route, true) ?>">Execute
+                                data-url="<?= Url::to(['/' . $model->route], true) ?>">Execute
                         </button>
                     </div>
                     <div class="panel-body">
