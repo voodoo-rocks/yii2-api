@@ -6,7 +6,6 @@
  */
 namespace vr\api;
 
-use vr\api\components\ErrorHandler;
 use vr\api\components\Harvester;
 use Yii;
 use yii\base\Exception;
@@ -71,16 +70,15 @@ class Module extends \yii\base\Module
                 $response = $event->sender;
 
                 if ($response->format == Response::FORMAT_JSON) {
+                    if (!is_array($response->data)) {
+                        $response->data = [$response->data];
+                    }
 
                     if ($response->isSuccessful) {
-                        $response->data = [
-                            'success' => $response->isSuccessful,
-                            'data'    => $response->data,
-                        ];
+                        $response->data = ['success' => $response->isSuccessful] + $response->data;
                     } else {
                         $response->data = [
                             'success'   => $response->isSuccessful,
-                            'data'      => null,
                             'exception' => $response->data,
                         ];
                     }
