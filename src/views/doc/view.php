@@ -2,11 +2,13 @@
 
 use vr\api\components\widgets\ControllersListView;
 use vr\api\components\widgets\InputParamsView;
+use vr\api\models\ActionModel;
 use vr\api\models\ControllerModel;
 use yii\helpers\Url;
 
-/** @var ControllerModel $model */
+/** @var ActionModel $model */
 /** @var ControllerModel[] $controllers */
+/** @var bool $includeHeader */
 
 ?>
 
@@ -22,21 +24,31 @@ use yii\helpers\Url;
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <span class="label label-default"><?= implode(',', $model->verbs) ?></span>
+                        <?php if ($model->requiresAuthentication): ?>
+                            <span class="glyphicon glyphicon-lock"></span>
+                        <?php endif ?>
+
                         <?= $model->route ?>
 
-                        <button id="execute" class="btn btn-default pull-right btn-xs"
-                                data-url="<?= Url::to(['/' . $model->route], true) ?>">Execute
-                        </button>
+                        <div class="btn-group pull-right" role="group" aria-label="...">
+                            <button class="btn btn-default btn-xs" data-clipboard-target="#request-text">
+                                Copy
+                            </button>
+
+                            <button id="execute" class="btn btn-success btn-xs"
+                                    data-url="<?= Url::to(['/' . $model->route], true) ?>">Execute
+                            </button>
+                        </div>
                     </div>
                     <div class="panel-body">
                         <p>
                             <?= $model->description ?>
                         </p>
 
-                        <pre><code class="json editable" contenteditable="true" id="request-block"><?=
+                        <pre><code class="json editable" contenteditable="true" id="request-text"><?=
                                 InputParamsView::widget([
-                                    'params' => $model->getInputParams(),
+                                    'params'        => $model->getInputParams(),
+                                    'includeHeader' => $includeHeader,
                                 ]) ?></code></pre>
                     </div>
                 </div>

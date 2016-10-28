@@ -8,6 +8,7 @@
 
 namespace vr\api\components\widgets;
 
+use vr\api\models\HeaderModel;
 use yii\base\Widget;
 use yii\helpers\Json;
 
@@ -23,6 +24,11 @@ class InputParamsView extends Widget
     public $params;
 
     /**
+     * @var bool
+     */
+    public $includeHeader = false;
+
+    /**
      *
      */
     public function init()
@@ -35,6 +41,16 @@ class InputParamsView extends Widget
      */
     public function run()
     {
-        return $this->params ? Json::encode($this->params, JSON_PRETTY_PRINT) : '{}';
+        if (!$this->params) {
+            $this->params = [];
+        }
+
+        $extra = [];
+
+        if ($this->includeHeader) {
+            $extra += ['header' => new HeaderModel()];
+        }
+
+        return Json::encode($extra + $this->params, JSON_PRETTY_PRINT);
     }
 }

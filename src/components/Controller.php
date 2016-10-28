@@ -6,6 +6,8 @@
  */
 namespace vr\api\components;
 
+use vr\api\components\filters\QueryParamAuth;
+use vr\api\components\filters\TokenAuth;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -18,6 +20,8 @@ use yii\web\BadRequestHttpException;
  */
 class Controller extends \yii\rest\Controller
 {
+    public $authExcept = [];
+    public $authOnly   = null;
     /**
      * @var bool
      */
@@ -29,13 +33,15 @@ class Controller extends \yii\rest\Controller
     public function behaviors()
     {
         $filters = [
-            'apiChecker' => [
+            'apiChecker'    => [
                 'class' => ApiCheckerFilter::className(),
             ],
-//            'authenticator' => [
-//                'class' => QueryParamAuth::className(),
-//            ],
-            'verbs'      => [
+            'authenticator' => [
+                'class'  => TokenAuth::className(),
+                'except' => $this->authExcept,
+                'only'   => $this->authOnly,
+            ],
+            'verbs'         => [
                 'class'   => VerbFilter::className(),
                 'actions' => [
                     '*' => ['post'],
@@ -113,7 +119,7 @@ class Controller extends \yii\rest\Controller
     /**
      * @param $action
      *
-     * @return null|string
+     * @return null|array
      */
     public function getActionParams($action)
     {
@@ -122,7 +128,6 @@ class Controller extends \yii\rest\Controller
 
         try {
             $action->runWithParams([]);
-
         } catch (VerboseException $exception) {
             return $exception->params;
         }

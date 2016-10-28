@@ -8,12 +8,14 @@
 
 namespace vr\api\models;
 
+use vr\api\components\filters\TokenAuth;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class Action
  * @package vr\api\models
+ * @property bool $requiresAuthentication
  */
 class ActionModel extends Model
 {
@@ -43,12 +45,25 @@ class ActionModel extends Model
     public $controllerModel = null;
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getInputParams()
     {
         /** @noinspection PhpMethodParametersCountMismatchInspection */
-        return $this->controllerModel->createInstance()->getActionParams($this->getId(), ['verbose']);
+        $params = $this->controllerModel->createInstance()->getActionParams($this->getId(), ['verbose']);
+
+        if (!$params) {
+            $params = [];
+        }
+
+        if ($this->getRequiresAuthentication()) {
+            $token = \Yii::$app->session->get(TokenAuth::DEFAULT_TOKEN_PATH,
+                ArrayHelper::getValue($params, TokenAuth::DEFAULT_TOKEN_PATH));
+
+            $params = [TokenAuth::DEFAULT_TOKEN_PATH => $token] + $params;
+        }
+
+        return $params;
     }
 
     /**
@@ -59,5 +74,23 @@ class ActionModel extends Model
         $parts = explode('/', $this->route);
 
         return ArrayHelper::getValue($parts, count($parts) - 1);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRequiresAuthentication()
+    {
+        $controller = $this->controllerModel->createInstance();
+
+        /** @var TokenAuth $authenticator */
+        $authenticator = ArrayHelper::getValue($controller->behaviors, 'authenticator');
+        if (!$authenticator) {
+            return false;
+        }
+
+        $action = $controller->createAction($this->getId());
+
+        return $authenticator->requiresAuthentication($action);
     }
 }
