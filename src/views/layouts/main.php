@@ -10,6 +10,7 @@ use yii\web\View;
 ModuleAssets::register($this);
 
 /** @var string $content */
+/** @var View $this */
 ?>
 
 <?php $this->beginPage(); ?>
@@ -40,8 +41,9 @@ $harvester = Yii::$app->controller->module->get('harvester');
 
 $items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function ($module) {
     return [
-        'label' => $module,
-        'url'   => Url::to('@web/' . $module . '/doc/index'),
+        'label'  => $module,
+        'url'    => Url::to('@web/' . $module . '/doc/index'),
+        'active' => Yii::$app->controller->module->uniqueId == $module,
     ];
 });
 
