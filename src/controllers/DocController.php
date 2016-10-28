@@ -9,7 +9,6 @@ namespace vr\api\controllers;
 use vr\api\components\Harvester;
 use Yii;
 use yii\base\Module;
-use yii\helpers\Inflector;
 use yii\web\Controller;
 
 /**
@@ -40,8 +39,9 @@ class DocController extends Controller
 
         if ($route) {
             return $this->render('@api/views/doc/view', [
-                'controllers' => $controllers,
-                'model'       => $harvester->findAction($module, $route),
+                'controllers'   => $controllers,
+                'model'         => $harvester->findAction($module, $route),
+                'includeHeader' => Yii::$app->session->get('include-header', false),
             ]);
         }
 
@@ -51,28 +51,13 @@ class DocController extends Controller
     }
 
     /**
-     * @param      $controller
-     * @param null $action
-     *
-     * @return string
+     * @return \yii\web\Response
      */
-    public function actionView($controller, $action = null)
+    public function actionToggleHeader()
     {
-        if ($action) {
-            $this->view->title = sprintf('%s > %s - %s',
-                Inflector::camel2words($controller),
-                Inflector::camel2words($action),
-                Yii::$app->name);
+        Yii::$app->session->set('include-header', !Yii::$app->session->get('include-header', false));
 
-            return $this->render('@api/views/doc/view', [
-                'controller' => $controller,
-                'action'     => $action,
-            ]);
-        } else {
-            return $this->render('@api/views/doc/overview', [
-                'controller' => $controller,
-            ]);
-        }
+        return $this->redirect(Yii::$app->request->referrer ?: 'index');
     }
 
     /**
@@ -88,12 +73,4 @@ class DocController extends Controller
 
         return parent::beforeAction($action);
     }
-
-    /**
-     *
-     */
-    public function actionEditable()
-    {
-    }
-
 }

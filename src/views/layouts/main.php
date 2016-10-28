@@ -66,6 +66,19 @@ echo Nav::widget([
     'items'   => $items,
 ]);
 
+echo Nav::widget([
+    'options' => [
+        'class' => 'nav navbar-nav navbar-right',
+    ],
+    'items'   => [
+        [
+            'label'  => ($active = Yii::$app->session->get('include-header', false)) ? '+ Header' : '- Header',
+            'url'    => ['doc/toggle-header'],
+            'active' => $active,
+        ],
+    ],
+]);
+
 NavBar::end();
 ?>
 

@@ -22,8 +22,7 @@ class Module extends \yii\base\Module
      * @var array
      */
     public $controllerMap = [
-        'doc'   => 'vr\api\controllers\DocController',
-        'tests' => 'vr\api\controllers\TestsController',
+        'doc' => 'vr\api\controllers\DocController',
     ];
 
     public $hiddenMode = false;
@@ -45,7 +44,6 @@ class Module extends \yii\base\Module
         }
 
         Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
-        Yii::setAlias('@vendor', __DIR__ . '/../vendor');
 
         /** @noinspection PhpUndefinedFieldInspection */
         if (YII_DEBUG || (Yii::$app->has('api') && Yii::$app->api->enableDocs)) {
@@ -70,8 +68,8 @@ class Module extends \yii\base\Module
                 $response = $event->sender;
 
                 if ($response->format == Response::FORMAT_JSON) {
-                    if (!is_array($response->data)) {
-                        $response->data = [$response->data];
+                    if (!$response->data) {
+                        $response->data = [];
                     }
 
                     if ($response->isSuccessful) {

@@ -12,14 +12,13 @@ $(document).ready(function () {
     $('#execute').on('click', function () {
         function show(data, status) {
             $('.response-block .json').text(JSON.stringify(data, null, 4));
-            $('.response-block').removeClass('panel-default').addClass('panel-' + status);
-            $('.response-block .btn').removeClass('btn-default').addClass('btn-' + status);
+            $('.response-block').removeClass('panel-default panel-danger panel-success').addClass('panel-' + status);
         }
 
         $.ajax({
             url        : $(this).attr('data-url'),
             method     : 'post',
-            data       : $('#request-block').text(),
+            data       : $('#request-text').text(),
             contentType: 'application/json'
         })
             .success(function (data) { show(data, 'success');})
@@ -38,7 +37,7 @@ $(document).ready(function () {
             return this.each(function () {
                 var $this = $(this);
                 var htmlOld = $this.html();
-                $this.bind('paste cut focus blur', function () {
+                $this.bind('focus blur', function () {
                     var htmlNew = $this.html();
                     if (htmlOld !== htmlNew) {
                         $this.trigger('change');
