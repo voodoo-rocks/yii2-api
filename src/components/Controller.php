@@ -103,8 +103,10 @@ class Controller extends \yii\rest\Controller
      */
     private function checkContentType()
     {
+        $contentType = ArrayHelper::getValue(explode(';', Yii::$app->request->getContentType()), 0);
+
         $found = ArrayHelper::getValue(Yii::$app->get('request'),
-            ['parsers', Yii::$app->request->getContentType()]);
+            ['parsers', $contentType]);
 
         if (!$found) {
             $acceptable = ArrayHelper::getValue(Yii::$app->get('request'), 'parsers', []);
