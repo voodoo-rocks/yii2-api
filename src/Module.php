@@ -84,7 +84,7 @@ class Module extends \yii\base\Module
             },
             'formatters'    => [
                 Response::FORMAT_JSON => [
-                    'class'         => 'yii\web\JsonResponseFormatter',
+                    'class'         => '\vr\api\components\JsonResponseFormatter',
                     'prettyPrint'   => YII_DEBUG, // use "pretty" output in debug mode
                     'encodeOptions' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
                 ],
