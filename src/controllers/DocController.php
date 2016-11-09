@@ -39,9 +39,9 @@ class DocController extends Controller
 
         if ($route) {
             return $this->render('@api/views/doc/view', [
-                'controllers'   => $controllers,
-                'model'         => $harvester->findAction($module, $route),
-                'includeHeader' => Yii::$app->session->get('include-header', false),
+                'controllers' => $controllers,
+                'model'       => $harvester->findAction($module, $route),
+                'includeMeta' => Yii::$app->session->get('include-meta', false),
             ]);
         }
 
@@ -53,9 +53,9 @@ class DocController extends Controller
     /**
      * @return \yii\web\Response
      */
-    public function actionToggleHeader()
+    public function actionToggleMeta()
     {
-        Yii::$app->session->set('include-header', !Yii::$app->session->get('include-header', false));
+        Yii::$app->session->set('include-meta', !Yii::$app->session->get('include-meta', false));
 
         return $this->redirect(Yii::$app->request->referrer ?: 'index');
     }

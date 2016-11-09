@@ -19,7 +19,6 @@ class DocParser extends Object
 
     public function init()
     {
-
     }
 
     public function getParams()

@@ -8,7 +8,7 @@
 
 namespace vr\api\components;
 
-use vr\api\models\HeaderModel;
+use vr\api\models\MetaModel;
 
 /**
  * Class Model
@@ -17,7 +17,20 @@ use vr\api\models\HeaderModel;
 class Model extends \yii\base\Model
 {
     /**
-     * @var HeaderModel
+     * @var MetaModel
      */
-    public $header;
+    public $meta;
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => NullBehaviour::className(),
+            ],
+        ];
+    }
+
 }

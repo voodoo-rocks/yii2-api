@@ -12,10 +12,10 @@ use DateTimeZone;
 use yii\base\Model;
 
 /**
- * Class HeaderModel
+ * Class MetaModel
  * @package vr\api\components\models
  */
-class HeaderModel extends Model
+class MetaModel extends Model
 {
     /**
      * @var
@@ -32,6 +32,20 @@ class HeaderModel extends Model
      */
     public $bundle;
 
+    /**
+     * @var
+     */
+    public $method;
+
+    /**
+     * @var
+     */
+    /** @noinspection SpellCheckingInspection */
+    public $udid;
+
+    /**
+     *
+     */
     public function init()
     {
         parent::init();

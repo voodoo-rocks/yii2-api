@@ -45,6 +45,7 @@ class TokenAuth extends AuthMethod
 
         $token = ArrayHelper::getValue($request, $this->accessTokenPath);
         if (!$token || !($identity = $user->loginByAccessToken($token))) {
+            \Yii::$app->session->remove(TokenAuth::DEFAULT_TOKEN_PATH);
             throw new UnauthorizedHttpException('Incorrect or expired token provided');
         }
 
