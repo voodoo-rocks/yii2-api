@@ -8,7 +8,7 @@ use yii\helpers\Url;
 
 /** @var ActionModel $model */
 /** @var ControllerModel[] $controllers */
-/** @var bool $includeHeader */
+/** @var bool $includeMeta */
 
 ?>
 
@@ -47,8 +47,8 @@ use yii\helpers\Url;
 
                         <pre><code class="json editable" contenteditable="true" id="request-text"><?=
                                 InputParamsView::widget([
-                                    'params'        => $model->getInputParams(),
-                                    'includeHeader' => $includeHeader,
+                                    'params'      => $model->getInputParams(),
+                                    'includeMeta' => $includeMeta,
                                 ]) ?></code></pre>
                     </div>
                 </div>

@@ -72,8 +72,8 @@ echo Nav::widget([
     ],
     'items'   => [
         [
-            'label'  => ($active = Yii::$app->session->get('include-header', false)) ? '+ Header' : '- Header',
-            'url'    => ['doc/toggle-header'],
+            'label'  => ($active = Yii::$app->session->get('include-meta', false)) ? '+ Meta' : '- Meta',
+            'url'    => ['doc/toggle-meta'],
             'active' => $active,
         ],
     ],

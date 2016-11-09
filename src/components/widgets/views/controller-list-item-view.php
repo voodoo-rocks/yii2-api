@@ -19,9 +19,9 @@ use yii\widgets\ListView;
             'class' => 'list-group',
             'tag'   => 'div',
         ],
-        'itemOptions' => [
-            'tag' => null,
-            'class' => 'list-group-item'
+        'itemOptions'  => [
+            'tag'   => null,
+            'class' => 'list-group-item',
         ],
         'itemView'     => 'action-list-item-view',
         'layout'       => '{items}',
