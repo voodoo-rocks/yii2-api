@@ -20,8 +20,14 @@ use yii\web\BadRequestHttpException;
  */
 class Controller extends \yii\rest\Controller
 {
+    /**
+     * @var array
+     */
     public $authExcept = [];
-    public $authOnly   = null;
+    /**
+     * @var null
+     */
+    public $authOnly = null;
     /**
      * @var bool
      */
@@ -54,7 +60,7 @@ class Controller extends \yii\rest\Controller
 
     /**
      * @param \yii\base\Action $action
-     * @param mixed            $result
+     * @param mixed $result
      *
      * @return mixed
      */
@@ -112,7 +118,7 @@ class Controller extends \yii\rest\Controller
             $acceptable = ArrayHelper::getValue(Yii::$app->get('request'), 'parsers', []);
 
             throw new BadRequestHttpException('Incorrect content type. Following content types are acceptable: ' .
-                                              implode(',', array_keys($acceptable)));
+                implode(',', array_keys($acceptable)));
         }
 
         return true;
@@ -125,7 +131,7 @@ class Controller extends \yii\rest\Controller
      */
     public function getActionParams($action)
     {
-        $action        = $this->createAction($action);
+        $action = $this->createAction($action);
         $this->verbose = true;
 
         try {
