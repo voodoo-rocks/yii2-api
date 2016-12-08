@@ -16,13 +16,17 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url        : $(this).attr('data-url'),
-            method     : 'post',
-            data       : $('#request-text').text(),
+            url: $(this).attr('data-url'),
+            method: 'post',
+            data: $('#request-text').text(),
             contentType: 'application/json'
         })
-            .success(function (data) { show(data, 'success');})
-            .fail(function (data) {show(data['responseJSON'], 'danger');})
+            .success(function (data) {
+                show(data, 'success');
+            })
+            .fail(function (data) {
+                show(data['responseJSON'], 'danger');
+            })
             .always(function () {
 
                 $('.response-block').removeClass('hidden');
