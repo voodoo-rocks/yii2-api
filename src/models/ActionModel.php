@@ -8,6 +8,7 @@
 
 namespace vr\api\models;
 
+use vr\api\components\Controller;
 use vr\api\components\filters\TokenAuth;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -49,18 +50,23 @@ class ActionModel extends Model
      */
     public function getInputParams()
     {
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $params = $this->controllerModel->createInstance()->getActionParams($this->getId(), ['verbose']);
+
+        /** @var Controller $instance */
+        $instance = $this->controllerModel->createInstance();
+
+        $params = $instance->getActionParams($this->getId());
 
         if (!$params) {
             $params = [];
         }
 
-        if ($this->getRequiresAuthentication()) {
-            $token = \Yii::$app->session->get(TokenAuth::DEFAULT_TOKEN_PATH,
-                ArrayHelper::getValue($params, TokenAuth::DEFAULT_TOKEN_PATH));
+        $tokenAttribute = ArrayHelper::getValue($instance->getBehavior('authenticator'), 'accessTokenPath');
 
-            $params = [TokenAuth::DEFAULT_TOKEN_PATH => $token] + $params;
+        if ($this->getRequiresAuthentication()) {
+            $token = \Yii::$app->session->get($tokenAttribute,
+                ArrayHelper::getValue($params, $tokenAttribute));
+
+            $params = [$tokenAttribute => $token] + $params;
         }
 
         return $params;

@@ -29,8 +29,8 @@ class TokenAuth extends AuthMethod
     /**
      * Authenticates the current user.
      *
-     * @param \yii\web\User     $user
-     * @param \yii\web\Request  $request
+     * @param \yii\web\User $user
+     * @param \yii\web\Request $request
      * @param \yii\web\Response $response
      *
      * @return \yii\web\IdentityInterface the authenticated user identity. If authentication information is not
@@ -45,11 +45,11 @@ class TokenAuth extends AuthMethod
 
         $token = ArrayHelper::getValue($request, $this->accessTokenPath);
         if (!$token || !($identity = $user->loginByAccessToken($token))) {
-            \Yii::$app->session->remove(TokenAuth::DEFAULT_TOKEN_PATH);
+            \Yii::$app->session->remove($this->accessTokenPath);
             throw new UnauthorizedHttpException('Incorrect or expired token provided');
         }
 
-        \Yii::$app->session->set(TokenAuth::DEFAULT_TOKEN_PATH, $token);
+        \Yii::$app->session->set($this->accessTokenPath, $token);
 
         return $identity;
     }
