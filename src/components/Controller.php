@@ -6,7 +6,6 @@
  */
 namespace vr\api\components;
 
-use vr\api\components\filters\QueryParamAuth;
 use vr\api\components\filters\TokenAuth;
 use Yii;
 use yii\filters\VerbFilter;
