@@ -36,7 +36,7 @@ class Module extends \yii\base\Module
 
         if (\Yii::$app->user) {
             \Yii::$app->user->enableSession = false;
-            \Yii::$app->user->loginUrl      = null;
+            \Yii::$app->user->loginUrl = null;
         }
 
         if (!YII_DEBUG) {
@@ -54,17 +54,18 @@ class Module extends \yii\base\Module
 
         Yii::$app->set('request', [
             'enableCookieValidation' => false,
-            'enableCsrfValidation'   => false,
+            'enableCsrfValidation' => false,
 
-            'class'   => Request::className(),
+            'class' => Request::className(),
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ],
         ]);
 
         Yii::$app->set('response', [
-            'class'         => '\yii\web\Response',
+            'class' => '\yii\web\Response',
             'on beforeSend' => function ($event) {
+                /** @var Response $response */
                 $response = $event->sender;
 
                 if ($response->format == Response::FORMAT_JSON) {
@@ -76,16 +77,18 @@ class Module extends \yii\base\Module
                         $response->data = ['success' => $response->isSuccessful] + $response->data;
                     } else {
                         $response->data = [
-                            'success'   => $response->isSuccessful,
+                            'success' => $response->isSuccessful,
                             'exception' => $response->data,
                         ];
                     }
                 }
+
+                $response->setStatusCode(null);
             },
-            'formatters'    => [
+            'formatters' => [
                 Response::FORMAT_JSON => [
-                    'class'         => '\vr\api\components\JsonResponseFormatter',
-                    'prettyPrint'   => YII_DEBUG, // use "pretty" output in debug mode
+                    'class' => '\vr\api\components\JsonResponseFormatter',
+                    'prettyPrint' => YII_DEBUG, // use "pretty" output in debug mode
                     'encodeOptions' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
                 ],
             ],
