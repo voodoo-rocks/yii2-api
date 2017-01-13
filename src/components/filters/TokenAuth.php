@@ -21,6 +21,13 @@ use yii\web\UnauthorizedHttpException;
 class TokenAuth extends AuthMethod
 {
     const DEFAULT_TOKEN_PATH = 'accessToken';
+
+    const AUTH_LEVEL_REQUIRED = 1;
+
+    const AUTH_LEVEL_OPTIONAL = 0;
+
+    const AUTH_LEVEL_NONE = -1;
+
     /**
      * @var array
      */
@@ -44,7 +51,8 @@ class TokenAuth extends AuthMethod
         $request = Json::decode($request->rawBody);
 
         $token = ArrayHelper::getValue($request, $this->accessTokenPath);
-        if (!$token || !($identity = $user->loginByAccessToken($token))) {
+
+        if (!$this->isOptional(\Yii::$app->requestedAction) && !$token || !($identity = $user->loginByAccessToken($token))) {
             \Yii::$app->session->remove($this->accessTokenPath);
             throw new UnauthorizedHttpException('Incorrect or expired token provided');
         }
@@ -59,8 +67,12 @@ class TokenAuth extends AuthMethod
      *
      * @return bool
      */
-    public function requiresAuthentication($action)
+    public function getAuthLevel($action)
     {
-        return $this->isActive($action);
+        if ($this->isOptional($action)) {
+            return self::AUTH_LEVEL_OPTIONAL;
+        }
+
+        return $this->isActive($action) ? self::AUTH_LEVEL_REQUIRED : self::AUTH_LEVEL_NONE;
     }
 }

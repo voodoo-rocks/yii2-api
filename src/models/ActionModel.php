@@ -62,7 +62,7 @@ class ActionModel extends Model
 
         $tokenAttribute = ArrayHelper::getValue($instance->getBehavior('authenticator'), 'accessTokenPath');
 
-        if ($this->getRequiresAuthentication()) {
+        if ($this->getAuthLevel() >= TokenAuth::AUTH_LEVEL_NONE) {
             $token = \Yii::$app->session->get($tokenAttribute,
                 ArrayHelper::getValue($params, $tokenAttribute));
 
@@ -85,7 +85,7 @@ class ActionModel extends Model
     /**
      * @return bool
      */
-    public function getRequiresAuthentication()
+    public function getAuthLevel()
     {
         $controller = $this->controllerModel->createInstance();
 
@@ -97,6 +97,6 @@ class ActionModel extends Model
 
         $action = $controller->createAction($this->getId());
 
-        return $authenticator->requiresAuthentication($action);
+        return $authenticator->getAuthLevel($action);
     }
 }

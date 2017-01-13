@@ -1,5 +1,6 @@
 <?php
 
+use vr\api\components\filters\TokenAuth;
 use vr\api\components\widgets\ControllersListView;
 use vr\api\components\widgets\InputParamsView;
 use vr\api\models\ActionModel;
@@ -24,9 +25,15 @@ use yii\helpers\Url;
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <?php if ($model->requiresAuthentication): ?>
+                        <?php if ($model->getAuthLevel() >= TokenAuth::AUTH_LEVEL_NONE): ?>
                             <span class="glyphicon glyphicon-lock"></span>
+
+                            <?php if ($model->getAuthLevel() == TokenAuth::AUTH_LEVEL_OPTIONAL): ?>
+                                (optional)
+                            <?php endif ?>
                         <?php endif ?>
+
+
 
                         <?= $model->route ?>
 
@@ -47,7 +54,7 @@ use yii\helpers\Url;
 
                         <pre><code class="json editable" contenteditable="true" id="request-text"><?=
                                 InputParamsView::widget([
-                                    'params'      => $model->getInputParams(),
+                                    'params' => $model->getInputParams(),
                                     'includeMeta' => $includeMeta,
                                 ]) ?></code></pre>
                     </div>
