@@ -27,6 +27,9 @@ class Controller extends \yii\rest\Controller
      * @var null
      */
     public $authOnly = null;
+
+    public $authOptional = [];
+
     /**
      * @var bool
      */
@@ -38,16 +41,17 @@ class Controller extends \yii\rest\Controller
     public function behaviors()
     {
         $filters = [
-            'apiChecker'    => [
+            'apiChecker' => [
                 'class' => ApiCheckerFilter::className(),
             ],
             'authenticator' => [
-                'class'  => TokenAuth::className(),
+                'class' => TokenAuth::className(),
                 'except' => $this->authExcept,
-                'only'   => $this->authOnly,
+                'only' => $this->authOnly,
+                'optional' => $this->authOptional
             ],
-            'verbs'         => [
-                'class'   => VerbFilter::className(),
+            'verbs' => [
+                'class' => VerbFilter::className(),
                 'actions' => [
                     '*' => ['post'],
                 ],
