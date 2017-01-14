@@ -11,7 +11,9 @@ namespace vr\api\models;
 use vr\api\components\Controller;
 use vr\api\components\filters\TokenAuth;
 use yii\base\Model;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
+use yii\web\IdentityInterface;
 
 /**
  * Class Action
@@ -63,8 +65,19 @@ class ActionModel extends Model
         $tokenAttribute = ArrayHelper::getValue($instance->getBehavior('authenticator'), 'accessTokenPath');
 
         if ($this->getAuthLevel() >= TokenAuth::AUTH_LEVEL_NONE) {
-            $token = \Yii::$app->session->get($tokenAttribute,
-                ArrayHelper::getValue($params, $tokenAttribute));
+            $token = \Yii::$app->session->get($tokenAttribute, ArrayHelper::getValue($params, $tokenAttribute));
+
+            if (!$token && !in_array($tokenAttribute, $params)) {
+                $object = \Yii::createObject(\Yii::$app->user->identityClass);
+
+                /** @var ActiveQuery $query */
+                $query = call_user_func([$object, 'find']);
+
+                /** @var IdentityInterface $identity */
+                if ($identity = $query->orderBy('rand()')->limit(1)->one()) {
+                    $token = $identity->getAuthKey();
+                }
+            }
 
             $params = [$tokenAttribute => $token] + $params;
         }
