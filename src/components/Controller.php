@@ -28,6 +28,9 @@ class Controller extends \yii\rest\Controller
      */
     public $authOnly = null;
 
+    /**
+     * @var array
+     */
     public $authOptional = [];
 
     /**

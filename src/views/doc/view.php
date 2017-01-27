@@ -25,15 +25,13 @@ use yii\helpers\Url;
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <?php if ($model->getAuthLevel() >= TokenAuth::AUTH_LEVEL_NONE): ?>
+                        <?php if ($model->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE): ?>
                             <span class="glyphicon glyphicon-lock"></span>
 
                             <?php if ($model->getAuthLevel() == TokenAuth::AUTH_LEVEL_OPTIONAL): ?>
                                 (optional)
                             <?php endif ?>
                         <?php endif ?>
-
-
 
                         <?= $model->route ?>
 
