@@ -41,7 +41,9 @@ use yii\helpers\Url;
                             </button>
 
                             <button id="execute" class="btn btn-success btn-xs"
-                                    data-url="<?= Url::to(['/' . $model->route], true) ?>">Execute
+                                    data-url="<?= Url::to(['/' . $model->route], true) ?>"
+                                    data-loading-text="Executing...">
+                                Execute
                             </button>
                         </div>
                     </div>
