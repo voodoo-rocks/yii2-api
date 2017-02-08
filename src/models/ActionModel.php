@@ -65,9 +65,9 @@ class ActionModel extends Model
         $tokenAttribute = ArrayHelper::getValue($instance->getBehavior('authenticator'), 'accessTokenPath');
 
         if ($this->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE) {
-            $token = \Yii::$app->session->get($tokenAttribute, ArrayHelper::getValue($params, $tokenAttribute));
+            $token = ArrayHelper::getValue($params, $tokenAttribute, \Yii::$app->session->get($tokenAttribute));
 
-            if (!$token && !in_array($tokenAttribute, $params)) {
+            if (!$token) {
                 $object = \Yii::createObject(\Yii::$app->user->identityClass);
 
                 /** @var ActiveQuery $query */

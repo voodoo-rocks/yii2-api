@@ -10,6 +10,9 @@ $(document).ready(function () {
     });
 
     $('#execute').on('click', function () {
+
+        var $btn = $(this).button('loading')
+
         function show(data, status) {
             $('.response-block .json').text(JSON.stringify(data, null, 4));
             $('.response-block').removeClass('panel-default panel-danger panel-success').addClass('panel-' + status);
@@ -28,6 +31,7 @@ $(document).ready(function () {
                 show(data['responseJSON'], 'danger');
             })
             .always(function () {
+                $btn.button('reset');
 
                 $('.response-block').removeClass('hidden');
                 $('.response-block .json').each(function (i, block) {
