@@ -50,8 +50,8 @@ class AssociatedArrayValidator extends Validator
         $dynamic = DynamicModel::validateData($value, $this->rules);
 
         if ($dynamic->hasErrors()) {
-            foreach ($dynamic->firstErrors as $attribute => $error) {
-                $this->addError($model, 'user', $error);
+            foreach ($dynamic->firstErrors as $key => $error) {
+                $this->addError($model, $attribute, $error);
             }
         }
     }
