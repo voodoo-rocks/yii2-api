@@ -11,7 +11,6 @@ namespace vr\api\components;
 
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseJson;
-use yii\helpers\Inflector;
 
 /**
  * Class Json
