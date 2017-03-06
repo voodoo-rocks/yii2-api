@@ -14,7 +14,6 @@ use yii\base\Component;
 use yii\base\Module;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
-use yii\helpers\Inflector;
 
 /**
  * Class Harvester
