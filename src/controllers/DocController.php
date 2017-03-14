@@ -7,6 +7,7 @@
 namespace vr\api\controllers;
 
 use vr\api\components\Harvester;
+use vr\api\models\ActionModel;
 use Yii;
 use yii\base\Module;
 use yii\web\Controller;
@@ -38,9 +39,24 @@ class DocController extends Controller
         $controllers = $harvester->getControllers($module);
 
         if ($route) {
+
+            $exception = null;
+            $params = [];
+
+            /** @var ActionModel $model */
+            $model = $harvester->findAction($module, $route);
+
+            try {
+                $params = $model->getInputParams();
+            } catch (\Exception $e) {
+                $exception = $e;
+            }
+
             return $this->render('@api/views/doc/view', [
                 'controllers' => $controllers,
-                'model'       => $harvester->findAction($module, $route),
+                'params' => $params,
+                'exception' => $exception,
+                'model' => $model,
                 'includeMeta' => Yii::$app->session->get('include-meta', false),
             ]);
         }
@@ -69,7 +85,7 @@ class DocController extends Controller
     public function beforeAction($action)
     {
         Yii::$app->request->enableCsrfValidation = false;
-        Yii::$app->assetManager->forceCopy       = defined('YII_DEBUG') && YII_DEBUG;
+        Yii::$app->assetManager->forceCopy = defined('YII_DEBUG') && YII_DEBUG;
 
         return parent::beforeAction($action);
     }

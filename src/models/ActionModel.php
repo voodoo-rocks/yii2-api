@@ -52,7 +52,6 @@ class ActionModel extends Model
      */
     public function getInputParams()
     {
-
         /** @var Controller $instance */
         $instance = $this->controllerModel->createInstance();
 
