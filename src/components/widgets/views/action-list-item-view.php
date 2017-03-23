@@ -9,7 +9,7 @@ $active = Yii::$app->request->get('route', null) == $model->route;
 
 ?>
 
-<a href="<?= Url::current(['route' => $model->route]) ?>"
+<a href="<?= Url::to(['/' . $model->route]) ?>"
    class="list-group-item <?= $active ? 'active' : null ?>">
     <?= $model->label ?>
 </a>

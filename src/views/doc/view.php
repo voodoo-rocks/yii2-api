@@ -10,7 +10,6 @@ use yii\helpers\Url;
 /** @var ActionModel $model */
 /** @var ControllerModel[] $controllers */
 /** @var bool $includeMeta */
-/** @var Exception $exception */
 
 ?>
 
@@ -41,13 +40,11 @@ use yii\helpers\Url;
                                 Copy
                             </button>
 
-                            <?php if (!$exception) : ?>
-                                <button id="execute" class="btn btn-success btn-xs"
-                                        data-url="<?= Url::to(['/' . $model->route], true) ?>"
-                                        data-loading-text="Executing...">
-                                    Execute
-                                </button>
-                            <?php endif; ?>
+                            <button id="execute" class="btn btn-success btn-xs"
+                                    data-url="<?= Url::to(['/' . $model->route], true) ?>"
+                                    data-loading-text="Executing...">
+                                Execute
+                            </button>
                         </div>
                     </div>
                     <div class="panel-body">
@@ -55,17 +52,11 @@ use yii\helpers\Url;
                             <?= $model->description ?>
                         </p>
 
-                        <?php if (!$exception) : ?>
-                            <pre><code class="json editable" contenteditable="true" id="request-text"><?=
-                                    InputParamsView::widget([
-                                        'params' => $params,
-                                        'includeMeta' => $includeMeta,
-                                    ]) ?></code></pre>
-
-                        <?php else: ?>
-                            <pre id="request-text"><b><?= $exception->getMessage() ?: 'There is an exception occurred' ?></b>
-                                <p><?= $exception->getTraceAsString() ?></p></pre>
-                        <?php endif; ?>
+                        <pre><code class="json editable" contenteditable="true" id="request-text"><?=
+                                InputParamsView::widget([
+                                    'params' => $model->getInputParams(),
+                                    'includeMeta' => $includeMeta,
+                                ]) ?></code></pre>
                     </div>
                 </div>
             </div>

@@ -50,7 +50,7 @@ $items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function (
 /** @noinspection PhpUndefinedFieldInspection */
 NavBar::begin([
     'brandLabel'            => Yii::$app->name . ' ' . ArrayHelper::getValue(Yii::$app->get('api', false), 'version'),
-    'brandUrl'              => ['overview/index'],
+    'brandUrl'              => Url::to([Yii::$app->controller->module->defaultRoute]),
     'options'               => [
         'class' => 'navbar navbar-inverse navbar-fixed-top',
     ],
