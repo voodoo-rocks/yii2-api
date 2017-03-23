@@ -7,9 +7,7 @@
 namespace vr\api\controllers;
 
 use vr\api\components\Harvester;
-use vr\api\models\ActionModel;
 use Yii;
-use yii\base\Module;
 use yii\web\Controller;
 
 /**
@@ -24,42 +22,14 @@ class DocController extends Controller
     public $layout = '@api/views/layouts/main';
 
     /**
-     * @param null $route
-     *
      * @return string
      */
-    public function actionIndex($route = null)
+    public function actionIndex()
     {
         /** @var Harvester $harvester */
         $harvester = Yii::$app->controller->module->get('harvester');
 
-        /** @var Module $module */
-        $module = \Yii::$app->controller->module;
-
-        $controllers = $harvester->getControllers($module);
-
-        if ($route) {
-
-            $exception = null;
-            $params = [];
-
-            /** @var ActionModel $model */
-            $model = $harvester->findAction($module, $route);
-
-            try {
-                $params = $model->getInputParams();
-            } catch (\Exception $e) {
-                $exception = $e;
-            }
-
-            return $this->render('@api/views/doc/view', [
-                'controllers' => $controllers,
-                'params' => $params,
-                'exception' => $exception,
-                'model' => $model,
-                'includeMeta' => Yii::$app->session->get('include-meta', false),
-            ]);
-        }
+        $controllers = $harvester->getControllers(\Yii::$app->controller->module);
 
         return $this->render('@api/views/doc/index', [
             'controllers' => $controllers,
@@ -72,7 +42,6 @@ class DocController extends Controller
     public function actionToggleMeta()
     {
         Yii::$app->session->set('include-meta', !Yii::$app->session->get('include-meta', false));
-
         return $this->redirect(Yii::$app->request->referrer ?: 'index');
     }
 

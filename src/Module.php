@@ -44,14 +44,15 @@ class Module extends \yii\base\Module
             $this->controllerMap = [];
         }
 
+        $this->set('harvester', new Harvester());
+        $this->defaultRoute = 'doc/index';
+
         Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
 
         /** @noinspection PhpUndefinedFieldInspection */
         if (YII_DEBUG || (Yii::$app->has('api') && Yii::$app->api->enableDocs)) {
             $this->controllerMap['doc'] = 'vr\api\controllers\DocController';
         }
-
-        $this->set('harvester', new Harvester());
 
         Yii::$app->set('request', [
             'enableCookieValidation' => false,
@@ -64,25 +65,7 @@ class Module extends \yii\base\Module
         ]);
 
         Yii::$app->set('response', [
-            'class' => '\yii\web\Response',
-            'on beforeSend' => function ($event) {
-                $response = $event->sender;
-
-                if ($response->format == Response::FORMAT_JSON) {
-                    if (!$response->data) {
-                        $response->data = [];
-                    }
-
-                    if ($response->isSuccessful) {
-                        $response->data = ['success' => $response->isSuccessful] + $response->data;
-                    } else {
-                        $response->data = [
-                            'success' => $response->isSuccessful,
-                            'exception' => $response->data,
-                        ];
-                    }
-                }
-            },
+            'class' => '\vr\api\components\Response',
             'formatters' => [
                 Response::FORMAT_JSON => [
                     'class' => '\vr\api\components\JsonResponseFormatter',

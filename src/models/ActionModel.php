@@ -52,9 +52,9 @@ class ActionModel extends Model
      */
     public function getInputParams()
     {
+
         /** @var Controller $instance */
         $instance = $this->controllerModel->createInstance();
-
         $params = $instance->getActionParams($this->getId());
 
         if (!$params) {
@@ -66,7 +66,7 @@ class ActionModel extends Model
         if ($this->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE) {
             $token = ArrayHelper::getValue($params, $tokenAttribute, \Yii::$app->session->get($tokenAttribute));
 
-            if (!$token) {
+            if (!$token && is_a(\Yii::$app->user->identityClass, '\yii\db\ActiveRecordInterface')) {
                 $object = \Yii::createObject(\Yii::$app->user->identityClass);
 
                 /** @var ActiveQuery $query */

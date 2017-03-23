@@ -6,12 +6,15 @@
  */
 namespace vr\api\components;
 
+use vr\api\components\filters\ApiCheckerFilter;
 use vr\api\components\filters\TokenAuth;
 use Yii;
+use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\log\Logger;
 use yii\web\BadRequestHttpException;
+use yii\web\Response;
 
 /**
  * Class Controller
@@ -51,12 +54,20 @@ class Controller extends \yii\rest\Controller
                 'class' => TokenAuth::className(),
                 'except' => $this->authExcept,
                 'only' => $this->authOnly,
-                'optional' => $this->authOptional
+                'optional' => $this->authOptional,
+            ],
+            'contentNegotiator' => [
+                'class' => ContentNegotiator::className(),
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                    'application/xml' => Response::FORMAT_XML,
+                    'text/html' => Response::FORMAT_HTML,
+                ],
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    '*' => ['post'],
+                    '*' => ['post', 'get'],
                 ],
             ],
         ];
@@ -102,9 +113,13 @@ class Controller extends \yii\rest\Controller
             Yii::beginProfile($action->uniqueId);
         }
 
-        if (!parent::beforeAction($action) || !$this->checkContentType()) {
+        if (!parent::beforeAction($action)
+            && !Yii::$app->request->getIsGet()
+            && !$this->checkContentType()
+        ) {
             return false;
         };
+
 
         return true;
     }
