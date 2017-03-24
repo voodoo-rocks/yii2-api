@@ -8,9 +8,6 @@
 
 namespace vr\api\components;
 
-
-use yii\web\Response;
-
 /**
  * Class JsonResponseFormatter
  * @package vr\api\components
