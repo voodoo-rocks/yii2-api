@@ -44,6 +44,11 @@ class MetaModel extends Model
     public $udid;
 
     /**
+     * @var
+     */
+    public $locale;
+
+    /**
      *
      */
     public function init()
@@ -51,7 +56,7 @@ class MetaModel extends Model
         parent::init();
 
         $this->timezone = (new DateTimeZone('Europe/Kaliningrad'))->getOffset(new \DateTime()) / 60;
-        $this->version  = \Yii::$app->version;
-        $this->bundle   = 'com.example.app';
+        $this->version = \Yii::$app->version;
+        $this->bundle = 'com.example.app';
     }
 }
