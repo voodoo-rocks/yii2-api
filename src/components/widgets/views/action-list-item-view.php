@@ -5,7 +5,7 @@ use yii\helpers\Url;
 
 /** @var ActionModel $model */
 
-$active = Yii::$app->request->get('route', null) == $model->route;
+$active = Yii::$app->requestedAction->uniqueId == $model->route;
 
 ?>
 
