@@ -12,7 +12,6 @@ use vr\api\models\ControllerModel;
 use Yii;
 use yii\base\Component;
 use yii\base\Module;
-use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 
 /**
@@ -41,7 +40,7 @@ class Harvester extends Component
 
             if (is_subclass_of($module, \vr\api\Module::className()) && !$module->hiddenMode) {
 
-                $relative                         = array_merge($path ? explode('/', $path) : [], [$alias]);
+                $relative = array_merge($path ? explode('/', $path) : [], [$alias]);
                 $modules[implode('/', $relative)] = $module->className();
 
                 $modules = array_merge($modules, $this->getModules($module, $alias));
@@ -78,14 +77,26 @@ class Harvester extends Component
     {
         $files = FileHelper::findFiles($module->controllerPath, ['only' => ['*Controller.php']]);
 
-        return ArrayHelper::getColumn($files, function ($file) use ($module) {
+        $controllers = [];
+
+        foreach ($files as $file) {
             $class = pathinfo($file, PATHINFO_FILENAME);
             $route = Inflector::camel2id($class = substr($class, 0, strlen($class) - strlen('Controller')));
 
-            return new ControllerModel([
+            $controller = new ControllerModel([
                 'route' => $module->uniqueId . '/' . $route,
                 'label' => Inflector::camel2words($class),
             ]);
-        });
+
+            $controller->loadActions();
+
+            if ($controller->isActive) {
+                $controllers = array_merge([$controller], $controllers);
+            } else {
+                $controllers = array_merge($controllers, [$controller]);
+            }
+        }
+
+        return $controllers;
     }
 }
