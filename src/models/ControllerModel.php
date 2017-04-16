@@ -13,6 +13,8 @@ use yii\helpers\Inflector;
 /**
  * Class Controller
  * @package vr\api\models
+ *
+ * @property bool isActive
  */
 class ControllerModel extends Model
 {
@@ -30,6 +32,11 @@ class ControllerModel extends Model
      * @var
      */
     public $description;
+
+    /**
+     * @var
+     */
+    private $actions;
 
     /**
      * @return null
@@ -68,6 +75,10 @@ class ControllerModel extends Model
         return $instance;
     }
 
+    /**
+     * @param $route
+     * @return null|ActionModel
+     */
     public function findAction($route)
     {
         /** @var ActionModel $action */
@@ -85,11 +96,17 @@ class ControllerModel extends Model
      */
     public function getActions()
     {
+        return $this->actions;
+    }
+
+    /**
+     *
+     */
+    public function loadActions()
+    {
         $instance = $this->createInstance();
 
         $reflection = new \ReflectionClass($instance);
-
-        $actions = [];
 
         /** @var VerbFilter $filter */
         $filter = ArrayHelper::getValue($instance->behaviors(), 'verbs');
@@ -102,17 +119,17 @@ class ControllerModel extends Model
                     'source' => $method->getDocComment(),
                 ]);
 
-                $actions[] = new ActionModel([
+                $action = new ActionModel([
                     'controllerModel' => $this,
-                    'verbs'           => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
-                    'route'           => $this->route . '/' . $route,
-                    'description'     => $docParser->getDescription(),
-                    'label'           => Inflector::camel2words($route),
+                    'verbs' => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
+                    'route' => $this->route . '/' . $route,
+                    'description' => $docParser->getDescription(),
+                    'label' => Inflector::camel2words($route),
                 ]);
+
+                $this->actions[] = $action;
             }
         }
-
-        return $actions;
     }
 
     /**
@@ -129,5 +146,19 @@ class ControllerModel extends Model
         }
 
         return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsActive()
+    {
+        foreach ($this->actions as $action) {
+            if ($action->isActive) {
+                return true;
+            };
+        }
+
+        return false;
     }
 }

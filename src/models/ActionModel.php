@@ -18,7 +18,9 @@ use yii\web\IdentityInterface;
 /**
  * Class Action
  * @package vr\api\models
- * @property bool $requiresAuthentication
+ *
+ * @property bool requiresAuthentication
+ * @property bool isActive
  */
 class ActionModel extends Model
 {
@@ -110,5 +112,13 @@ class ActionModel extends Model
         $action = $controller->createAction($this->getId());
 
         return $authenticator->getAuthLevel($action);
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsActive()
+    {
+        return \Yii::$app->requestedRoute == $this->route;
     }
 }
