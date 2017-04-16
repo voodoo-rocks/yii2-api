@@ -207,10 +207,15 @@ class Controller extends \yii\rest\Controller
      * @return bool
      * @throws VerboseException
      */
-    protected function checkInputParams($callable)
+    protected function checkInputParams($callable = null)
     {
         if ($this->verbose) {
-            $params = call_user_func($callable);
+            $params = [];
+
+            if ($callable) {
+                $params = call_user_func($callable);
+            }
+
             throw new VerboseException($params);
         }
 
