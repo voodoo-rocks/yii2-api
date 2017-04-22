@@ -12,6 +12,7 @@ use vr\api\models\ControllerModel;
 use Yii;
 use yii\base\Component;
 use yii\base\Module;
+use vr\core\Inflector;
 use yii\helpers\FileHelper;
 
 /**
