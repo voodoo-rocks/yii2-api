@@ -13,6 +13,7 @@ use vr\api\models\MetaModel;
 /**
  * Class Model
  * @package vr\api\components
+ * @deprecated Use vr\core\Model instead
  */
 class Model extends \yii\base\Model
 {

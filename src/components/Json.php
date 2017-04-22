@@ -9,6 +9,7 @@
 namespace vr\api\components;
 
 
+use vr\core\Inflector;
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseJson;
 

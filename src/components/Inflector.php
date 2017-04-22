@@ -15,6 +15,7 @@ use yii\helpers\BaseInflector;
 /**
  * Class Inflector
  * @package app\modules\api\components
+ * @deprecated Use vr\core\Inflector instead
  */
 class Inflector extends BaseInflector
 {
