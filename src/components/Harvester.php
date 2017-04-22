@@ -40,7 +40,7 @@ class Harvester extends Component
 
             if (is_subclass_of($module, \vr\api\Module::className()) && !$module->hiddenMode) {
 
-                $relative = array_merge($path ? explode('/', $path) : [], [$alias]);
+                $relative                         = array_merge($path ? explode('/', $path) : [], [$alias]);
                 $modules[implode('/', $relative)] = $module->className();
 
                 $modules = array_merge($modules, $this->getModules($module, $alias));
@@ -88,7 +88,9 @@ class Harvester extends Component
                 'label' => Inflector::camel2words($class),
             ]);
 
-            $controller->loadActions();
+            if (!$controller->loadActions()) {
+                continue;
+            }
 
             if ($controller->isActive) {
                 $controllers = array_merge([$controller], $controllers);

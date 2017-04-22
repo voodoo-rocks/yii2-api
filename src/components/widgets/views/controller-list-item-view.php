@@ -8,11 +8,7 @@ use yii\widgets\ListView;
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <?php if ($model->isActive) : ?>
-            <b><?= $model->label ?></b>
-        <?php else: ?>
-            <?= $model->label ?>
-        <?php endif; ?>
+        <?= $model->label ?>
     </div>
 
     <?= ListView::widget([

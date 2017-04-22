@@ -5,6 +5,7 @@ namespace vr\api\models;
 use ReflectionMethod;
 use vr\api\components\Controller;
 use vr\api\components\DocParser;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -13,7 +14,6 @@ use yii\helpers\Inflector;
 /**
  * Class Controller
  * @package vr\api\models
- *
  * @property bool isActive
  */
 class ControllerModel extends Model
@@ -36,7 +36,7 @@ class ControllerModel extends Model
     /**
      * @var
      */
-    private $actions;
+    private $actions = [];
 
     /**
      * @return null
@@ -69,7 +69,12 @@ class ControllerModel extends Model
     public function createInstance()
     {
         /** @var \yii\web\Controller $instance */
-        list($instance, $success) = \Yii::$app->createController($this->route);
+
+        try {
+            list($instance) = \Yii::$app->createController($this->route);
+        } catch (InvalidConfigException $exception) {
+            return null;
+        }
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $instance;
@@ -77,6 +82,7 @@ class ControllerModel extends Model
 
     /**
      * @param $route
+     *
      * @return null|ActionModel
      */
     public function findAction($route)
@@ -106,6 +112,10 @@ class ControllerModel extends Model
     {
         $instance = $this->createInstance();
 
+        if (!$instance) {
+            return false;
+        }
+
         $reflection = new \ReflectionClass($instance);
 
         /** @var VerbFilter $filter */
@@ -121,15 +131,17 @@ class ControllerModel extends Model
 
                 $action = new ActionModel([
                     'controllerModel' => $this,
-                    'verbs' => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
-                    'route' => $this->route . '/' . $route,
-                    'description' => $docParser->getDescription(),
-                    'label' => Inflector::camel2words($route),
+                    'verbs'           => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
+                    'route'           => $this->route . '/' . $route,
+                    'description'     => $docParser->getDescription(),
+                    'label'           => Inflector::camel2words($route),
                 ]);
 
                 $this->actions[] = $action;
             }
         }
+
+        return true;
     }
 
     /**
