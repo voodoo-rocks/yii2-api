@@ -51,6 +51,6 @@ class InputParamsView extends Widget
             $extra += ['meta' => new MetaModel()];
         }
 
-        return Json::encode($extra + $this->params, JSON_PRETTY_PRINT);
+        return Json::encode($extra + $this->params, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }
