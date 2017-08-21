@@ -61,9 +61,7 @@ class TokenAuth extends AuthMethod
     {
         $identity = null;
 
-        /** @var array $request */
-        /** @noinspection PhpUndefinedFieldInspection */
-        $request = Json::decode($request->rawBody);
+        $request = $request->getBodyParams();
 
         $token = ArrayHelper::getValue($request, $this->accessTokenPath);
 
