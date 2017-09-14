@@ -21,7 +21,7 @@ use yii\helpers\Url;
     </div>
 
     <div class="col-sm-10">
-        <div class="row">
+        <div class="row sticky-top">
             <div class="col-sm-12">
                 <?php if ($model->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE): ?>
                     <span class="glyphicon glyphicon-lock"></span>
