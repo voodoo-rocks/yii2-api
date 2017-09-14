@@ -22,7 +22,7 @@ $(document).ready(function () {
             success    : function (data) {
                 show(data, 'success');
             },
-            fail       : function (data) {
+            error       : function (data) {
                 show(data['responseJSON'], 'danger');
             },
             always     : function (data) {
