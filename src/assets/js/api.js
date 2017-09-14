@@ -10,34 +10,29 @@ $(document).ready(function () {
     });
 
     $('#execute').on('click', function () {
-
-        var $btn = $(this).button('loading')
-
-        function show(data, status) {
+        function show(data) {
             $('.response-block .json').text(JSON.stringify(data, null, 4));
-            $('.response-block').removeClass('panel-default panel-danger panel-success').addClass('panel-' + status);
         }
 
         $.ajax({
-            url: $(this).attr('data-url'),
-            method: 'post',
-            data: $('#request-text').text(),
-            contentType: 'application/json'
-        })
-            .success(function (data) {
+            url        : $(this).attr('data-url'),
+            method     : 'post',
+            data       : $('#request-text').text(),
+            contentType: 'application/json',
+            success    : function (data) {
                 show(data, 'success');
-            })
-            .fail(function (data) {
+            },
+            fail       : function (data) {
                 show(data['responseJSON'], 'danger');
-            })
-            .always(function () {
-                $btn.button('reset');
-
+            },
+            always     : function (data) {
+                show(data, 'success');
                 $('.response-block').removeClass('hidden');
                 $('.response-block .json').each(function (i, block) {
                     hljs.highlightBlock(block);
                 });
-            });
+            }
+        });
     });
 
     (function ($) {
