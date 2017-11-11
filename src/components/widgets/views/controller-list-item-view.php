@@ -6,17 +6,16 @@ use yii\widgets\ListView;
 /** @var ControllerModel $model */
 ?>
 
-<div class="panel panel-default">
-    <div class="panel-heading">
+<div class="card mb-3">
+    <div class="card-header">
         <?= $model->label ?>
     </div>
-
     <?= ListView::widget([
         'dataProvider' => new ArrayDataProvider([
             'allModels' => $model->getActions(),
         ]),
         'options' => [
-            'class' => 'list-group',
+            'class' => 'list-group list-group-flush',
             'tag' => 'div',
         ],
         'itemOptions' => [
@@ -27,7 +26,3 @@ use yii\widgets\ListView;
         'layout' => '{items}',
     ]) ?>
 </div>
-
-<?php if ($model->isActive) : ?>
-    <hr>
-<?php endif; ?>

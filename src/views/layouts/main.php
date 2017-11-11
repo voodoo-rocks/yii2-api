@@ -2,7 +2,6 @@
 use vr\api\components\Harvester;
 use vr\api\components\ModuleAssets;
 use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\View;
@@ -45,45 +44,41 @@ $items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function (
         'url'    => Url::to('@web/' . $module . '/doc/index'),
         'active' => Yii::$app->controller->module->uniqueId == $module,
     ];
-});
+}); ?>
 
-/** @noinspection PhpUndefinedFieldInspection */
-NavBar::begin([
-    'brandLabel'            => Yii::$app->name . ' ' . ArrayHelper::getValue(Yii::$app->get('api', false), 'version'),
-    'brandUrl'              => Url::to([Yii::$app->controller->module->defaultRoute]),
-    'options'               => [
-        'class' => 'navbar navbar-inverse navbar-fixed-top',
-    ],
-    'innerContainerOptions' => [
-        'class' => 'container-fluid',
-    ],
-]);
+<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+    <a class="navbar-brand" href="#">
+        <?= Yii::$app->name . ' ' . ArrayHelper::getValue(Yii::$app->get('api', false), 'version') ?>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-echo Nav::widget([
-    'options' => [
-        'class' => 'nav navbar-nav',
-    ],
-    'items'   => $items,
-]);
-
-echo Nav::widget([
-    'options' => [
-        'class' => 'nav navbar-nav navbar-right',
-    ],
-    'items'   => [
-        [
-            'label'  => ($active = Yii::$app->session->get('include-meta', false)) ? '+ Meta' : '- Meta',
-            'url'    => ['doc/toggle-meta'],
-            'active' => $active,
+    <?= Nav::widget([
+        'options' => [
+            'class' => 'navbar-nav',
+            'tag'   => 'div',
         ],
-    ],
-]);
+        'items'   => $items,
+    ]); ?>
 
-NavBar::end();
-?>
+    <?= Nav::widget([
+        'options' => [
+            'class' => 'navbar-nav nav',
+        ],
+        'items'   => [
+            [
+                'label'  => ($active = Yii::$app->session->get('include-meta', false)) ? '+ Meta' : '- Meta',
+                'url'    => ['doc/toggle-meta'],
+                'active' => $active,
+            ],
+        ],
+    ]); ?>
+</nav>
 
 <!-- Begin page content -->
-<div class="container-fluid" style="padding-top: 60px">
+<div class="container-fluid mt-3">
     <?= $content; ?>
 </div>
 
