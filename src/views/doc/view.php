@@ -23,19 +23,19 @@ use yii\helpers\Url;
     <div class="col-sm-10">
         <div class="row sticky-top">
             <div class="col-sm-12">
-                <?php if ($model->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE): ?>
-                    <span class="glyphicon glyphicon-lock"></span>
+                <h4 class="float-left  pull-left">
+                    <?php if ($model->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE): ?>
+                        <span class="glyphicon glyphicon-lock"></span>
 
-                    <?php if ($model->getAuthLevel() == TokenAuth::AUTH_LEVEL_OPTIONAL): ?>
-                        (optional)
+                        <?php if ($model->getAuthLevel() == TokenAuth::AUTH_LEVEL_OPTIONAL): ?>
+                            (optional)
+                        <?php endif ?>
                     <?php endif ?>
-                <?php endif ?>
 
-                <h4 class="float-left">
                     <?= $model->route ?>
                 </h4>
 
-                <div class="btn-group float-right btn-group-sm" role="group" aria-label="...">
+                <div class="btn-group float-right btn-group-sm pull-right" role="group" aria-label="...">
                     <button class="btn btn-default" data-clipboard-target="#request-text">
                         Copy
                     </button>
@@ -65,11 +65,11 @@ use yii\helpers\Url;
 
         <div class="row mt-3">
             <div class="col-sm-12">
-                <h4 class="float-left">
+                <h4 class="float-left pull-left">
                     Response
                 </h4>
 
-                <button class="btn btn-default float-right btn-xs" data-clipboard-target="#response-text">
+                <button class="btn btn-default float-right btn-xs pull-right" data-clipboard-target="#response-text">
                     Copy
                 </button>
             </div>
