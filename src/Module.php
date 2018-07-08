@@ -4,6 +4,7 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
+
 namespace vr\api;
 
 use vr\api\components\Harvester;
@@ -35,14 +36,22 @@ class Module extends \yii\base\Module
         parent::init();
 
         if ($user = \Yii::$app->user) {
-            $user->enableSession = false;
+            $user->enableSession   = false;
             $user->enableAutoLogin = false;
-            $user->loginUrl = null;
+            $user->loginUrl        = null;
         }
 
         if (!YII_DEBUG) {
             $this->controllerMap = [];
         }
+
+        $this->controllerMap += [
+            'cors' => \vr\api\components\Controller::class,
+        ];
+
+        Yii::$app->urlManager->addRules([
+            'OPTIONS <opts:(.*)>' => 'cors/options',
+        ]);
 
         $this->set('harvester', new Harvester());
         $this->defaultRoute = 'doc/index';
@@ -56,20 +65,20 @@ class Module extends \yii\base\Module
 
         Yii::$app->set('request', [
             'enableCookieValidation' => false,
-            'enableCsrfValidation' => false,
+            'enableCsrfValidation'   => false,
 
-            'class' => Request::className(),
+            'class'   => Request::className(),
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ],
         ]);
 
         Yii::$app->set('response', [
-            'class' => '\vr\api\components\Response',
+            'class'      => '\vr\api\components\Response',
             'formatters' => [
                 Response::FORMAT_JSON => [
-                    'class' => '\vr\api\components\JsonResponseFormatter',
-                    'prettyPrint' => YII_DEBUG, // use "pretty" output in debug mode
+                    'class'         => '\vr\api\components\JsonResponseFormatter',
+                    'prettyPrint'   => YII_DEBUG, // use "pretty" output in debug mode
                     'encodeOptions' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
                 ],
             ],
