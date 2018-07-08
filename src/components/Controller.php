@@ -61,7 +61,7 @@ class Controller extends \yii\rest\Controller
             ],
             'authenticator'     => [
                 'class'    => TokenAuth::className(),
-                'except'   => $this->authExcept + ['cors/options'],
+                'except'   => $this->authExcept,
                 'only'     => $this->authOnly,
                 'optional' => $this->authOptional,
             ],
@@ -76,13 +76,24 @@ class Controller extends \yii\rest\Controller
             'verbs'             => [
                 'class'   => VerbFilter::className(),
                 'actions' => [
-                    '*'            => ['post', 'get'],
-                    'cors/options' => ['options'],
+                    '*' => ['post', 'get'],
                 ],
             ],
         ];
 
         return array_merge(parent::behaviors(), $filters);
+    }
+
+    /**
+     * @return array
+     */
+    public function actions()
+    {
+        return [
+            'options' => [
+                'class' => \vr\api\src\components\OptionsAction::class,
+            ],
+        ];
     }
 
     /**
@@ -121,6 +132,12 @@ class Controller extends \yii\rest\Controller
         /** @noinspection PhpUndefinedFieldInspection */
         if (Yii::$app->has('api', true) && Yii::$app->api->enableProfiling) {
             Yii::beginProfile($action->uniqueId);
+        }
+
+        if (\Yii::$app->request->method === 'OPTIONS') {
+            \Yii::$app->response->headers->add('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+            return false;
         }
 
         if (!parent::beforeAction($action)

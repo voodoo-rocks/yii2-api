@@ -45,14 +45,6 @@ class Module extends \yii\base\Module
             $this->controllerMap = [];
         }
 
-        $this->controllerMap += [
-            'cors' => \vr\api\components\Controller::class,
-        ];
-
-        Yii::$app->urlManager->addRules([
-            'OPTIONS <opts:(.*)>' => 'cors/options',
-        ]);
-
         $this->set('harvester', new Harvester());
         $this->defaultRoute = 'doc/index';
 
