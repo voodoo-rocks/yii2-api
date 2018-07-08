@@ -53,12 +53,6 @@ class Controller extends \yii\rest\Controller
             'apiChecker'        => [
                 'class' => ApiCheckerFilter::className(),
             ],
-            'corsFilter'        => [
-                'class' => \yii\filters\Cors::class,
-                'cors'  => [
-                    'Origin' => ['*'],
-                ],
-            ],
             'authenticator'     => [
                 'class'    => TokenAuth::className(),
                 'except'   => $this->authExcept,
@@ -82,18 +76,6 @@ class Controller extends \yii\rest\Controller
         ];
 
         return array_merge(parent::behaviors(), $filters);
-    }
-
-    /**
-     * @return array
-     */
-    public function actions()
-    {
-        return [
-            'options' => [
-                'class' => \vr\api\src\components\OptionsAction::class,
-            ],
-        ];
     }
 
     /**
