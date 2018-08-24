@@ -65,7 +65,7 @@ $items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function (
 
     <?= Nav::widget([
         'options' => [
-            'class' => 'navbar-nav nav',
+            'class' => 'navbar-nav float-right pull-right nav',
         ],
         'items'   => [
             [
