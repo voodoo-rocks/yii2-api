@@ -16,12 +16,11 @@ use yii\web\Response;
 /**
  * Class Module
  * @package vr\api
- *
  * How to set it up
  *          1. Add the following line to your .htaccess
  *              Header set Access-Control-Allow-Origin "*"
  *          2. Replace * with real URLs to prevent security breaches
- *          3. 
+ *          3.
  */
 class Module extends \yii\base\Module
 {
@@ -41,7 +40,8 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        if ($user = \Yii::$app->user) {
+        if (\Yii::$container->has('user')) {
+            $user                  = \Yii::$app->user;
             $user->enableSession   = false;
             $user->enableAutoLogin = false;
             $user->loginUrl        = null;
