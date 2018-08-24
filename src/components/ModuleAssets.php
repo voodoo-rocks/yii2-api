@@ -34,6 +34,7 @@ class ModuleAssets extends AssetBundle
      */
     public $css = [
         '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/default.min.css',
+        'css/api.css'
     ];
 
     /**

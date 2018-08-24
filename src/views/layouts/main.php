@@ -46,7 +46,7 @@ $items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function (
     ];
 }); ?>
 
-<nav class="navbar navbar-expand-lg navbar-inverse navbar-dark justify-content-between">
+<nav class="navbar navbar-expand-lg navbar-inverse navbar-dark rounded-0 justify-content-between">
     <a class="navbar-brand" href="#">
         <?= Yii::$app->name . ' ' . ArrayHelper::getValue(Yii::$app->get('api', false), 'version') ?>
     </a>
