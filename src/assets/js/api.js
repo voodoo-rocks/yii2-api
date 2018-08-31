@@ -63,4 +63,26 @@ $(document).ready(function () {
             hljs.highlightBlock(block);
         });
     });
+
+    $('.methods-filter').focus();
+
+    $('.methods-filter').jSearch({
+        selector  : '.list-group',
+        child : '.list-group-item',
+        minValLength: 0,
+        Before: function(){
+            $('.card').data('find','');
+        },
+        Found : function(elem, event){
+            $(elem).show();
+            $(elem).parent().parent().data('find','true');
+            $(elem).parent().parent().show();
+        },
+        NotFound : function(elem, event){
+            $(elem).hide();
+            if (!$(elem).parent().parent().data('find'))
+                $(elem).parent().parent().hide();
+        }
+    });
+
 });

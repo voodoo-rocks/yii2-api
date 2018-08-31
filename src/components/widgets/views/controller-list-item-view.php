@@ -6,8 +6,8 @@ use yii\widgets\ListView;
 /** @var ControllerModel $model */
 ?>
 
-<div class="card mb-3">
-    <div class="card-header">
+<div class="panel panel-default card mb-3">
+    <div class="panel-heading card-header">
         <?= $model->label ?>
     </div>
     <?= ListView::widget([

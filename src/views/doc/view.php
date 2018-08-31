@@ -15,6 +15,7 @@ use yii\helpers\Url;
 
 <div class="row">
     <div class="col-sm-2">
+        <?= $this->render('partials/actions-filter') ?>
         <?= ControllersListView::widget([
             'models' => $controllers,
         ]) ?>

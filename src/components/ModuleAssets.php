@@ -27,6 +27,7 @@ class ModuleAssets extends AssetBundle
         '//cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js',
         '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js',
         'js/api.js',
+        'js/jquery.easysearch.min.js'
     ];
 
     /**
