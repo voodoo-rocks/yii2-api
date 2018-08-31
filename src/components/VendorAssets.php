@@ -9,30 +9,29 @@ namespace vr\api\components;
 use yii\web\AssetBundle;
 
 /**
- * Class ModuleAssets
+ * Class VendorAssets
  * @package vr\api\components
  */
-class ModuleAssets extends AssetBundle
+class VendorAssets extends AssetBundle
 {
     /**
      * @var string
      */
-    public $sourcePath = '@api/assets';
+    public $sourcePath = '@vendor/';
 
     /**
      * @var array
      */
     public $js = [
-        'js/api.js',
-        'js/jquery.easysearch.min.js',
-        'js/run_prettify.js'
+        'components/highlightjs/highlight.pack.min.js',
+        'zenorocha/clipboardjs/dist/clipboard.min.js'
     ];
 
     /**
      * @var array
      */
     public $css = [
-        'css/api.css'
+        'components/highlightjs/styles/default.css'
     ];
 
     /**
@@ -40,7 +39,6 @@ class ModuleAssets extends AssetBundle
      */
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
-        'vr\api\components\VendorAssets'
+        'yii\bootstrap\BootstrapAsset'
     ];
 }
