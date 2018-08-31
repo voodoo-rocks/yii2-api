@@ -42,6 +42,6 @@ class ModuleAssets extends AssetBundle
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
-        'vr\api\components\VendorAssets'
+        'vr\api\components\HighlightJsAssets'
     ];
 }

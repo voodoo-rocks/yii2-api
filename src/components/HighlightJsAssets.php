@@ -4,33 +4,34 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
+
 namespace vr\api\components;
 
 use yii\web\AssetBundle;
 
 /**
- * Class VendorAssets
+ * Class HighlightJsAssets
  * @package vr\api\components
  */
-class VendorAssets extends AssetBundle
+class HighlightJsAssets extends AssetBundle
 {
     /**
      * @var string
      */
-    public $sourcePath = '@vendor/';
+    public $sourcePath = '@vendor/components/highlightjs/';
 
     /**
      * @var array
      */
     public $js = [
-        'components/highlightjs/highlight.pack.min.js'
+        'highlight.pack.min.js',
     ];
 
     /**
      * @var array
      */
     public $css = [
-        'components/highlightjs/styles/default.css'
+        'styles/default.css',
     ];
 
     /**
