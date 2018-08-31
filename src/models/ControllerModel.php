@@ -4,7 +4,7 @@ namespace vr\api\models;
 
 use ReflectionMethod;
 use vr\api\components\Controller;
-use vr\api\components\DocParser;
+use vr\api\components\DocCommentParser;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\filters\VerbFilter;
@@ -125,7 +125,7 @@ class ControllerModel extends Model
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             if ($route = $this->extractRoute($method)) {
 
-                $docParser = new DocParser([
+                $docParser = new DocCommentParser([
                     'source' => $method->getDocComment(),
                 ]);
 
@@ -140,6 +140,8 @@ class ControllerModel extends Model
                 $this->actions[] = $action;
             }
         }
+
+        ArrayHelper::multisort($this->actions, 'label');
 
         return true;
     }

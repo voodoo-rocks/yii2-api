@@ -42,6 +42,11 @@ class Controller extends \yii\rest\Controller
     /**
      * @var bool
      */
+    public $isTransactioned = true;
+
+    /**
+     * @var bool
+     */
     private $verbose = false;
 
     /**
@@ -98,6 +103,10 @@ class Controller extends \yii\rest\Controller
             Yii::endProfile($action->uniqueId);
         }
 
+        if ($this->isTransactioned && ($transaction = Yii::$app->db->getTransaction())) {
+            $transaction->commit();
+        }
+
         return $result;
     }
 
@@ -129,9 +138,21 @@ class Controller extends \yii\rest\Controller
             return false;
         };
 
+        if ($this->isTransactioned) {
+            Yii::$app->db->beginTransaction();
+        }
+        
         return true;
     }
 
+    /**
+     * @param string $id
+     * @param array  $params
+     *
+     * @return mixed|string
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\base\InvalidRouteException
+     */
     public function runAction($id, $params = [])
     {
         if (Yii::$app->request->isGet) {
@@ -171,6 +192,12 @@ class Controller extends \yii\rest\Controller
         return true;
     }
 
+    /**
+     * @param $route
+     *
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
     private function renderDocView($route)
     {
         /** @var Harvester $harvester */
