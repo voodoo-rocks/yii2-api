@@ -64,22 +64,26 @@ use yii\helpers\Url;
             </div>
         </div>
 
-        <div class="row mt-3">
-            <div class="col-sm-12">
-                <h4 class="float-left pull-left">
-                    Response
-                </h4>
+        <div class="response-wrapper hidden">
+            <div class="row mt-3">
+                <div class="col-sm-12">
+                    <h4 class="float-left pull-left">
+                        Response
+                        <small>received in <span class="exec-time"></span> sec.</small>
+                    </h4>
 
-                <button class="btn btn-default float-right btn-xs pull-right" data-clipboard-target="#response-text">
-                    Copy
-                </button>
+                    <button class="btn btn-default float-right btn-xs pull-right" data-clipboard-target="#response-text">
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="row mt-3 response-block">
+                <div class="col-sm-12">
+                    <pre><code class="json" id="response-text"></code></pre>
+                </div>
             </div>
         </div>
 
-        <div class="row mt-3 response-block">
-            <div class="col-sm-12">
-                <pre><code class="json" id="response-text"></code></pre>
-            </div>
-        </div>
     </div>
 </div>
