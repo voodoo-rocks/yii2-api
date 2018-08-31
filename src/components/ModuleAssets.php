@@ -25,7 +25,8 @@ class ModuleAssets extends AssetBundle
     public $js = [
         'js/api.js',
         'js/jquery.easysearch.min.js',
-        'js/run_prettify.js'
+        'js/run_prettify.js',
+        'js/clipboard.min.js'
     ];
 
     /**

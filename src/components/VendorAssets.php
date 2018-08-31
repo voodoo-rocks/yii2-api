@@ -23,8 +23,7 @@ class VendorAssets extends AssetBundle
      * @var array
      */
     public $js = [
-        'components/highlightjs/highlight.pack.min.js',
-        'zenorocha/clipboardjs/dist/clipboard.min.js'
+        'components/highlightjs/highlight.pack.min.js'
     ];
 
     /**
@@ -37,8 +36,5 @@ class VendorAssets extends AssetBundle
     /**
      * @var array
      */
-    public $depends = [
-        'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset'
-    ];
+    public $depends = [];
 }
