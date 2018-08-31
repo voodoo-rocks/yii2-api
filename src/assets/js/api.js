@@ -14,6 +14,8 @@ $(document).ready(function () {
             $('.response-block .json').text(JSON.stringify(data, null, 4));
         }
 
+        $(this).text('Executing...').prop('disabled', true);
+
         $.ajax({
             url        : $(this).attr('data-url'),
             method     : 'post',
@@ -25,12 +27,12 @@ $(document).ready(function () {
             error       : function (data) {
                 show(data['responseJSON'], 'danger');
             },
-            always     : function (data) {
-                show(data, 'success');
-                $('.response-block').removeClass('hidden');
+            complete    : function (data) {
+                $('.response-wrapper').removeClass('hidden');
                 $('.response-block .json').each(function (i, block) {
                     hljs.highlightBlock(block);
                 });
+                $('#execute').text('Execute').prop('disabled', false);
             }
         });
     });
