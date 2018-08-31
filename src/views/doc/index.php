@@ -17,6 +17,7 @@ use vr\api\models\ControllerModel;
     <div class="col-sm-10">
         <div class="row">
             <div class="col-sm-12">
+                <?= \vr\api\widgets\Alert::widget() ?>
                 Please choose an action on the left side
             </div>
         </div>
