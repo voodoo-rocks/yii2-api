@@ -16,6 +16,8 @@ $(document).ready(function () {
 
         $(this).text('Executing...').prop('disabled', true);
 
+        var ajaxTime = new Date().getTime();
+
         $.ajax({
             url        : $(this).attr('data-url'),
             method     : 'post',
@@ -28,6 +30,8 @@ $(document).ready(function () {
                 show(data['responseJSON'], 'danger');
             },
             complete    : function (data) {
+                var totalTime = (new Date().getTime() - ajaxTime) / 1000;
+                $('.exec-time').text(totalTime);
                 $('.response-wrapper').removeClass('hidden');
                 $('.response-block .json').each(function (i, block) {
                     hljs.highlightBlock(block);
