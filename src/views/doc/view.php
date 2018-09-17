@@ -22,7 +22,7 @@ use yii\helpers\Url;
     </div>
 
     <div class="col-sm-10">
-        <div class="row sticky-top">
+        <div class="row">
             <div class="col-sm-12">
                 <h4 class="float-left  pull-left">
                     <?php if ($model->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE): ?>
@@ -37,7 +37,7 @@ use yii\helpers\Url;
                 </h4>
 
                 <div class="btn-group float-right btn-group-sm pull-right" role="group" aria-label="...">
-                    <button class="btn btn-default" data-clipboard-target="#request-text">
+                    <button class="btn btn-default btn-light" data-clipboard-target="#request-text">
                         Copy
                     </button>
 
@@ -72,7 +72,7 @@ use yii\helpers\Url;
                         <small>received in <span class="exec-time"></span> sec.</small>
                     </h4>
 
-                    <button class="btn btn-default float-right btn-xs pull-right" data-clipboard-target="#response-text">
+                    <button class="btn btn-default btn-light float-right btn-xs pull-right" data-clipboard-target="#response-text">
                         Copy
                     </button>
                 </div>
