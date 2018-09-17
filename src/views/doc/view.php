@@ -56,7 +56,7 @@ use yii\helpers\Url;
                     <?= $model->description ?>
                 </p>
 
-                <pre><code class="json editable" contenteditable="true" id="request-text"><?=
+                <pre><code class="json editable bg-light" contenteditable="true" id="request-text"><?=
                         InputParamsView::widget([
                             'params'      => $model->getInputParams(),
                             'includeMeta' => $includeMeta,
@@ -80,7 +80,7 @@ use yii\helpers\Url;
 
             <div class="row mt-3 response-block">
                 <div class="col-sm-12">
-                    <pre><code class="json" id="response-text"></code></pre>
+                    <pre><code class="json bg-light" id="response-text"></code></pre>
                 </div>
             </div>
         </div>
