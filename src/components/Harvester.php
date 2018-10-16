@@ -9,11 +9,12 @@
 namespace vr\api\components;
 
 use vr\api\models\ControllerModel;
+use vr\core\Inflector;
 use Yii;
 use yii\base\Component;
 use yii\base\Module;
-use vr\core\Inflector;
 use yii\helpers\FileHelper;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Harvester
@@ -99,6 +100,8 @@ class Harvester extends Component
                 $controllers = array_merge($controllers, [$controller]);
             }
         }
+
+        ArrayHelper::multisort($controllers, 'label');
 
         return $controllers;
     }
