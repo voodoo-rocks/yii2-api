@@ -8,7 +8,6 @@
 
 namespace vr\api\validators;
 
-
 use Yii;
 use yii\base\DynamicModel;
 use yii\validators\Validator;
@@ -40,19 +39,26 @@ class AssociatedArrayValidator extends Validator
      */
     public function validateAttribute($model, $attribute)
     {
-        $value = $model->$attribute;
+        $attributes = $model->$attribute;
 
-        if (!is_array($value)) {
+        if (!is_array($attributes)) {
             $this->addError($model, $attribute, $this->message, []);
+
             return;
         }
 
-        $dynamic = DynamicModel::validateData($value, $this->rules);
+        // Add attributes missing in the model but mentioned in rules
+        foreach ($this->rules as $rule) {
+            $ruleAttributes = is_array($rule[0]) ? $rule[0] : [$rule[0]];
 
-        if ($dynamic->hasErrors()) {
-            foreach ($dynamic->firstErrors as $key => $error) {
-                $this->addError($model, $attribute, $error);
+            foreach ($ruleAttributes as $ruleAttribute) {
+                $attributes = $attributes + [
+                        $ruleAttribute => null,
+                    ];
             }
         }
+
+        $dynamic = DynamicModel::validateData($attributes, $this->rules);
+        $model->addErrors($dynamic->errors);
     }
 }
