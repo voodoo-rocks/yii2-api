@@ -6,7 +6,7 @@
  * Time: 20:34
  */
 
-namespace vr\api\components\widgets;
+namespace vr\api\widgets;
 
 use vr\api\models\MetaModel;
 use yii\base\Widget;
@@ -14,7 +14,7 @@ use yii\helpers\Json;
 
 /**
  * Class InputParamsView
- * @package vr\api\components\widgets
+ * @package vr\api\widgets
  */
 class InputParamsView extends Widget
 {

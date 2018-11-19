@@ -80,7 +80,8 @@ class Harvester extends Component
     {
         $files = FileHelper::findFiles($module->controllerPath, ['only' => ['*Controller.php']]);
 
-        $controllers = [];
+        $controllers      = [];
+        $activeController = null;
 
         foreach ($files as $file) {
             $class = pathinfo($file, PATHINFO_FILENAME);
@@ -96,13 +97,17 @@ class Harvester extends Component
             }
 
             if ($controller->isActive) {
-                $controllers = array_merge([$controller], $controllers);
+                $activeController = $controller;
             } else {
                 $controllers = array_merge($controllers, [$controller]);
             }
         }
 
         ArrayHelper::multisort($controllers, 'label');
+
+        if ($activeController) {
+            $controllers = array_merge([$activeController], $controllers);
+        }
 
         return $controllers;
     }

@@ -1,6 +1,6 @@
 <?php
 
-use vr\api\components\widgets\ControllersListView;
+use vr\api\widgets\ControllersListView;
 use vr\api\models\ControllerModel;
 
 /** @var ControllerModel[] $controllers */

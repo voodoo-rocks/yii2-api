@@ -1,8 +1,8 @@
 <?php
 
 use vr\api\components\filters\TokenAuth;
-use vr\api\components\widgets\ControllersListView;
-use vr\api\components\widgets\InputParamsView;
+use vr\api\widgets\ControllersListView;
+use vr\api\widgets\InputParamsView;
 use vr\api\models\ActionModel;
 use vr\api\models\ControllerModel;
 use yii\helpers\Url;
