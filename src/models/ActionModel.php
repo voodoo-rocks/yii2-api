@@ -18,9 +18,11 @@ use yii\web\IdentityInterface;
 /**
  * Class Action
  * @package vr\api\models
- *
- * @property bool requiresAuthentication
- * @property bool isActive
+ * @property bool   requiresAuthentication
+ * @property bool   $authLevel
+ * @property string $id
+ * @property array  $inputParams
+ * @property bool   isActive
  */
 class ActionModel extends Model
 {
@@ -51,13 +53,14 @@ class ActionModel extends Model
 
     /**
      * @return array
+     * @throws \yii\base\InvalidConfigException
      */
     public function getInputParams()
     {
 
         /** @var Controller $instance */
         $instance = $this->controllerModel->createInstance();
-        $params = $instance->getActionParams($this->getId());
+        $params   = $instance->getActionParams($this->getId());
 
         if (!$params) {
             $params = [];

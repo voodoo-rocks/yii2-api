@@ -8,14 +8,15 @@
 
 namespace vr\api\components;
 
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class DocCommentParser
  * @package vr\api\components
+ * @property string $description
  */
-class DocCommentParser extends Object
+class DocCommentParser extends BaseObject
 {
     /**
      * @var
@@ -31,20 +32,6 @@ class DocCommentParser extends Object
      *
      */
     public function init()
-    {
-    }
-
-    /**
-     *
-     */
-    public function getParams()
-    {
-    }
-
-    /**
-     *
-     */
-    public function getReturn()
     {
     }
 

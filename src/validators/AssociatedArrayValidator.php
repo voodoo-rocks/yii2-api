@@ -35,7 +35,10 @@ class AssociatedArrayValidator extends Validator
     }
 
     /**
-     * @inheritdoc
+     * @param \yii\base\Model $model
+     * @param string          $attribute
+     *
+     * @throws \yii\base\InvalidConfigException
      */
     public function validateAttribute($model, $attribute)
     {

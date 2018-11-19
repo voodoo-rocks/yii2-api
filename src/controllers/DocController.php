@@ -23,6 +23,7 @@ class DocController extends Controller
 
     /**
      * @return string
+     * @throws \yii\base\InvalidConfigException
      */
     public function actionIndex()
     {

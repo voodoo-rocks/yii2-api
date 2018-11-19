@@ -44,7 +44,7 @@ class Model extends \yii\base\Model
     {
         return [
             [
-                'class' => NullBehaviour::className(),
+                'class' => NullBehaviour::class,
             ],
         ];
     }

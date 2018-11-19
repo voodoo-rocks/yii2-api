@@ -65,7 +65,7 @@ class Module extends \yii\base\Module
             'enableCookieValidation' => false,
             'enableCsrfValidation'   => false,
 
-            'class'   => Request::className(),
+            'class'   => Request::class,
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ],

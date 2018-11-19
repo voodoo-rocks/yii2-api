@@ -8,7 +8,6 @@
 
 namespace vr\api\models;
 
-use DateTimeZone;
 use yii\base\Model;
 
 /**
@@ -55,8 +54,8 @@ class MetaModel extends Model
     {
         parent::init();
 
-        $this->timezone = (new DateTimeZone('Europe/Kaliningrad'))->getOffset(new \DateTime()) / 60;
-        $this->version = \Yii::$app->version;
-        $this->bundle = 'com.example.app';
+        $this->timezone = (new \DateTime())->getTimezone()->getOffset(new \DateTime()) / 60;
+        $this->version  = \Yii::$app->version;
+        $this->bundle   = 'com.example.app';
     }
 }

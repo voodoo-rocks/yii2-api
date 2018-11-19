@@ -4,6 +4,7 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
+
 namespace vr\api\components;
 
 use yii\web\AssetBundle;
@@ -26,14 +27,14 @@ class ModuleAssets extends AssetBundle
         'js/api.js',
         'js/jquery.easysearch.min.js',
         'js/run_prettify.js',
-        'js/clipboard.min.js'
+        'js/clipboard.min.js',
     ];
 
     /**
      * @var array
      */
     public $css = [
-        'css/api.css'
+        'css/api.css',
     ];
 
     /**
@@ -42,6 +43,6 @@ class ModuleAssets extends AssetBundle
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
-        'vr\api\components\HighlightJsAssets'
+        'vr\api\components\HighlightJsAssets',
     ];
 }

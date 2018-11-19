@@ -42,7 +42,7 @@ class Controller extends \yii\rest\Controller
     /**
      * @var bool
      */
-    public $isTransactioned = true;
+    public $isAtomic = true;
 
     /**
      * @var bool
@@ -56,16 +56,16 @@ class Controller extends \yii\rest\Controller
     {
         $filters = [
             'apiChecker'        => [
-                'class' => ApiCheckerFilter::className(),
+                'class' => ApiCheckerFilter::class,
             ],
             'authenticator'     => [
-                'class'    => TokenAuth::className(),
+                'class'    => TokenAuth::class,
                 'except'   => $this->authExcept,
                 'only'     => $this->authOnly,
                 'optional' => $this->authOptional,
             ],
             'contentNegotiator' => [
-                'class'   => ContentNegotiator::className(),
+                'class'   => ContentNegotiator::class,
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                     'application/xml'  => Response::FORMAT_XML,
@@ -73,7 +73,7 @@ class Controller extends \yii\rest\Controller
                 ],
             ],
             'verbs'             => [
-                'class'   => VerbFilter::className(),
+                'class'   => VerbFilter::class,
                 'actions' => [
                     '*' => ['post', 'get'],
                 ],
@@ -88,6 +88,7 @@ class Controller extends \yii\rest\Controller
      * @param mixed            $result
      *
      * @return mixed
+     * @throws \yii\db\Exception
      */
     public function afterAction($action, $result)
     {
@@ -103,7 +104,7 @@ class Controller extends \yii\rest\Controller
             Yii::endProfile($action->uniqueId);
         }
 
-        if ($this->isTransactioned && ($transaction = Yii::$app->db->getTransaction())) {
+        if ($this->isAtomic && ($transaction = Yii::$app->db->getTransaction())) {
             $transaction->commit();
         }
 
@@ -117,6 +118,7 @@ class Controller extends \yii\rest\Controller
      *
      * @return bool
      * @throws \yii\web\BadRequestHttpException
+     * @throws \yii\base\InvalidConfigException
      */
     function beforeAction($action)
     {
@@ -138,7 +140,7 @@ class Controller extends \yii\rest\Controller
             return false;
         };
 
-        if ($this->isTransactioned) {
+        if ($this->isAtomic) {
             Yii::$app->db->beginTransaction();
         }
 
@@ -178,6 +180,7 @@ class Controller extends \yii\rest\Controller
     /**
      * @return bool
      * @throws BadRequestHttpException
+     * @throws \yii\base\InvalidConfigException
      */
     private function checkContentType()
     {
@@ -223,6 +226,7 @@ class Controller extends \yii\rest\Controller
      * @param $action
      *
      * @return null|array
+     * @throws \yii\base\InvalidConfigException
      */
     public function getActionParams($action)
     {
@@ -231,7 +235,8 @@ class Controller extends \yii\rest\Controller
 
         try {
             $action->runWithParams([]);
-        } catch (VerboseException $exception) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (VerboseException $exception) {
             return $exception->params;
         }
 
