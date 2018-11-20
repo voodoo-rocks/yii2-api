@@ -75,7 +75,7 @@ class Controller extends \yii\rest\Controller
             'verbs'             => [
                 'class'   => VerbFilter::class,
                 'actions' => [
-                    '*' => ['post', 'get'],
+                    '*' => ['post'],
                 ],
             ],
         ];

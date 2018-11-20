@@ -129,6 +129,10 @@ class ControllerModel extends Model
                     'source' => $method->getDocComment(),
                 ]);
 
+                if ($this->route . '/' . $route == 'events/list') {
+                    var_dump($route);die;
+                }
+
                 $action = new ActionModel([
                     'controllerModel' => $this,
                     'verbs'           => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
