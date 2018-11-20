@@ -14,7 +14,8 @@ use yii\validators\Validator;
 
 /**
  * Class AssociatedArrayValidator
- * @package app\modules\api\validators
+ * @package    app\modules\api\validators
+ * @deprecated Please use vr\core\validators\AssociatedArrayValidator instead
  */
 class AssociatedArrayValidator extends Validator
 {
