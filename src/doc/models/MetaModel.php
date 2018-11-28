@@ -6,13 +6,13 @@
  * Time: 09:54
  */
 
-namespace vr\api\models;
+namespace vr\api\doc\models;
 
 use yii\base\Model;
 
 /**
  * Class MetaModel
- * @package vr\api\components\models
+ * @package vr\api\doc\components\models
  */
 class MetaModel extends Model
 {

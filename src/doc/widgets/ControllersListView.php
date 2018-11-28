@@ -6,7 +6,7 @@
  * Time: 15:57
  */
 
-namespace vr\api\widgets;
+namespace vr\api\doc\widgets;
 
 use yii\bootstrap\Widget;
 use yii\data\ArrayDataProvider;
@@ -14,7 +14,7 @@ use yii\widgets\ListView;
 
 /**
  * Class ControllersListView
- * @package vr\api\widgets
+ * @package vr\api\doc\widgets
  */
 class ControllersListView extends Widget
 {
@@ -34,7 +34,7 @@ class ControllersListView extends Widget
                 'allModels' => $this->models,
             ]),
             'layout'       => '{items}',
-            'itemView'     => '@api/widgets/views/controller-list-item-view',
+            'itemView'     => '@api/doc/widgets/views/controller-list-item-view',
         ]);
     }
 }

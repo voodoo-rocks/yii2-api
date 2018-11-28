@@ -6,9 +6,9 @@
  * Time: 15:04
  */
 
-namespace vr\api\components;
+namespace vr\api\doc\components;
 
-use vr\api\models\ControllerModel;
+use vr\api\doc\models\ControllerModel;
 use vr\core\Inflector;
 use Yii;
 use yii\base\Component;
@@ -18,7 +18,7 @@ use yii\helpers\FileHelper;
 
 /**
  * Class Harvester
- * @package vr\api\components
+ * @package vr\api\doc\components
  */
 class Harvester extends Component
 {
@@ -41,7 +41,7 @@ class Harvester extends Component
             /** @var Module $instance */
             $instance = $root->getModule($alias);
 
-            if (is_subclass_of($instance, \vr\api\Module::class) && !$instance->hiddenMode) {
+            if (is_subclass_of($instance, \vr\api\doc\Module::class) && !$instance->hiddenMode) {
 
                 $relative = array_merge($path ? explode('/', $path) : [], [$alias]);
 

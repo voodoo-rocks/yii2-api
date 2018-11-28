@@ -1,12 +1,12 @@
 <?php
 
-namespace vr\api\widgets;
+namespace vr\api\doc\widgets;
 
 use Yii;
 
 /**
  * Class Alert
- * @package vr\api\widgets
+ * @package vr\api\doc\widgets
  */
 class Alert extends \yii\bootstrap\Widget
 {

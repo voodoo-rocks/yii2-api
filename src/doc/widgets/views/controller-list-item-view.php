@@ -1,5 +1,5 @@
 <?php
-use vr\api\models\ControllerModel;
+use vr\api\doc\models\ControllerModel;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ListView;
 

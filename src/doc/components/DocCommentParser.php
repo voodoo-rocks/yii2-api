@@ -6,14 +6,14 @@
  * Time: 23:36
  */
 
-namespace vr\api\components;
+namespace vr\api\doc\components;
 
 use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class DocCommentParser
- * @package vr\api\components
+ * @package vr\api\doc\components
  * @property string $description
  */
 class DocCommentParser extends BaseObject

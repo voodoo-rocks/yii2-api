@@ -6,7 +6,7 @@
  * Time: 18:58
  */
 
-namespace vr\api\models;
+namespace vr\api\doc\models;
 
 use vr\api\components\Controller;
 use vr\api\components\filters\TokenAuth;
@@ -17,7 +17,7 @@ use yii\web\IdentityInterface;
 
 /**
  * Class Action
- * @package vr\api\models
+ * @package vr\api\doc\models
  * @property bool   requiresAuthentication
  * @property bool   $authLevel
  * @property string $id

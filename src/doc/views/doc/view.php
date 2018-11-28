@@ -1,10 +1,10 @@
 <?php
 
 use vr\api\components\filters\TokenAuth;
-use vr\api\widgets\ControllersListView;
-use vr\api\widgets\InputParamsView;
-use vr\api\models\ActionModel;
-use vr\api\models\ControllerModel;
+use vr\api\doc\widgets\ControllersListView;
+use vr\api\doc\widgets\InputParamsView;
+use vr\api\doc\models\ActionModel;
+use vr\api\doc\models\ControllerModel;
 use yii\helpers\Url;
 
 /** @var ActionModel $model */

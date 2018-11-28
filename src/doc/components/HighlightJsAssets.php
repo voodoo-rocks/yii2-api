@@ -5,13 +5,13 @@
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
-namespace vr\api\components;
+namespace vr\api\doc\components;
 
 use yii\web\AssetBundle;
 
 /**
  * Class HighlightJsAssets
- * @package vr\api\components
+ * @package vr\api\doc\components
  */
 class HighlightJsAssets extends AssetBundle
 {

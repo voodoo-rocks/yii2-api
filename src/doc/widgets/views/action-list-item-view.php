@@ -1,6 +1,6 @@
 <?php
 
-use vr\api\models\ActionModel;
+use vr\api\doc\models\ActionModel;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;

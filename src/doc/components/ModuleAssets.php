@@ -5,20 +5,20 @@
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
-namespace vr\api\components;
+namespace vr\api\doc\components;
 
 use yii\web\AssetBundle;
 
 /**
  * Class ModuleAssets
- * @package vr\api\components
+ * @package vr\api\doc\components
  */
 class ModuleAssets extends AssetBundle
 {
     /**
      * @var string
      */
-    public $sourcePath = '@api/assets';
+    public $sourcePath = '@api/doc/assets';
 
     /**
      * @var array
@@ -43,6 +43,6 @@ class ModuleAssets extends AssetBundle
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
-        'vr\api\components\HighlightJsAssets',
+        'vr\api\doc\components\HighlightJsAssets',
     ];
 }

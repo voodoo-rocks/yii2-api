@@ -7,7 +7,7 @@
 
 namespace vr\api;
 
-use vr\api\components\Harvester;
+use vr\api\doc\components\Harvester;
 use Yii;
 use yii\base\Exception;
 use yii\web\Request;
@@ -28,7 +28,7 @@ class Module extends \yii\base\Module
      * @var array
      */
     public $controllerMap = [
-        'doc' => 'vr\api\controllers\DocController',
+        'doc' => 'vr\api\doc\controllers\DocController',
     ];
 
     public $hiddenMode = false;
@@ -58,7 +58,7 @@ class Module extends \yii\base\Module
 
         /** @noinspection PhpUndefinedFieldInspection */
         if (YII_DEBUG || (Yii::$app->has('api') && Yii::$app->api->enableDocs)) {
-            $this->controllerMap['doc'] = 'vr\api\controllers\DocController';
+            $this->controllerMap['doc'] = 'vr\api\doc\controllers\DocController';
         }
 
         Yii::$app->set('request', [

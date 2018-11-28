@@ -1,10 +1,10 @@
 <?php
 
-namespace vr\api\models;
+namespace vr\api\doc\models;
 
 use ReflectionMethod;
-use vr\api\components\Controller;
-use vr\api\components\DocCommentParser;
+use vr\api\doc\components\Controller;
+use vr\api\doc\components\DocCommentParser;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\filters\VerbFilter;
@@ -13,7 +13,7 @@ use yii\helpers\Inflector;
 
 /**
  * Class Controller
- * @package vr\api\models
+ * @package vr\api\doc\models
  * @property bool isActive
  */
 class ControllerModel extends Model

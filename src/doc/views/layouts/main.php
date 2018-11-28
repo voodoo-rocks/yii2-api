@@ -1,6 +1,6 @@
 <?php
-use vr\api\components\Harvester;
-use vr\api\components\ModuleAssets;
+use vr\api\doc\components\Harvester;
+use vr\api\doc\components\ModuleAssets;
 use yii\bootstrap\Nav;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
