@@ -12,7 +12,6 @@ use vr\api\doc\models\ControllerModel;
 use vr\core\Inflector;
 use Yii;
 use yii\base\Component;
-use yii\base\Module;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 
@@ -23,8 +22,8 @@ use yii\helpers\FileHelper;
 class Harvester extends Component
 {
     /**
-     * @param Module $root
-     * @param string $path
+     * @param yii\base\Module $root
+     * @param string          $path
      *
      * @return array
      */
@@ -38,13 +37,12 @@ class Harvester extends Component
 
         foreach ($root->getModules() as $alias => $module) {
 
-            /** @var Module $instance */
             $instance = $root->getModule($alias);
 
-            if (is_subclass_of($instance, \vr\api\doc\Module::class) && !$instance->hiddenMode) {
-
+            if (is_subclass_of($instance, \vr\api\Module::class)) {
                 $relative = array_merge($path ? explode('/', $path) : [], [$alias]);
 
+                /** @noinspection PhpDeprecationInspection */
                 $modules[implode('/', $relative)] = $instance->className();
                 $modules                          = array_merge($modules, $this->getModules($instance, $alias));
             }
@@ -54,8 +52,8 @@ class Harvester extends Component
     }
 
     /**
-     * @param Module $module
-     * @param string $route
+     * @param yii\base\Module $module
+     * @param string          $route
      *
      * @return null
      */
@@ -72,7 +70,7 @@ class Harvester extends Component
     }
 
     /**
-     * @param Module $module
+     * @param yii\base\Module $module
      *
      * @return array
      */
