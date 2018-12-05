@@ -11,7 +11,6 @@ use vr\api\components\filters\ApiCheckerFilter;
 use vr\api\components\filters\TokenAuth;
 use vr\api\doc\components\Harvester;
 use vr\api\doc\controllers\DocController;
-use vr\api\Module;
 use Yii;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
@@ -56,15 +55,6 @@ class Controller extends \yii\rest\Controller
     public function behaviors()
     {
         $filters = [
-            'apiChecker'        => [
-                'class' => ApiCheckerFilter::class,
-            ],
-            'authenticator'     => [
-                'class'    => TokenAuth::class,
-                'except'   => $this->authExcept,
-                'only'     => $this->authOnly,
-                'optional' => $this->authOptional,
-            ],
             'contentNegotiator' => [
                 'class'   => ContentNegotiator::class,
                 'formats' => [
@@ -78,6 +68,15 @@ class Controller extends \yii\rest\Controller
                 'actions' => [
                     '*' => ['post'],
                 ],
+            ],
+            'authenticator'     => [
+                'class'    => TokenAuth::class,
+                'except'   => $this->authExcept,
+                'only'     => $this->authOnly,
+                'optional' => $this->authOptional,
+            ],
+            'apiChecker'        => [
+                'class' => ApiCheckerFilter::class,
             ],
         ];
 

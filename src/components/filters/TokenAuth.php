@@ -68,10 +68,6 @@ class TokenAuth extends AuthMethod
         if ($level > self::AUTH_LEVEL_NONE && !empty($token)) {
             $identity = $user->loginByAccessToken($token);
 
-            if (!$identity && !\Yii::$app->user->isGuest) {
-                \Yii::$app->user->logout();
-            }
-
             if ($level !== self::AUTH_LEVEL_NONE && !$identity) {
                 throw new UnauthorizedHttpException('Incorrect or expired token provided');
             };
