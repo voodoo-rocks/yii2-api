@@ -62,24 +62,20 @@ class TokenAuth extends AuthMethod
         $identity = null;
 
         $request = $request->getBodyParams();
+        $token   = ArrayHelper::getValue($request, $this->accessTokenPath);
+        $level   = $this->getAuthLevel(\Yii::$app->requestedAction);
 
-        $token = ArrayHelper::getValue($request, $this->accessTokenPath);
-
-        $level = $this->getAuthLevel(\Yii::$app->requestedAction);
         if ($level > self::AUTH_LEVEL_NONE && !empty($token)) {
             $identity = $user->loginByAccessToken($token);
 
-            if (!$identity) {
-                \Yii::$app->session->remove($this->accessTokenPath);
-                $token = null;
+            if (!$identity && !\Yii::$app->user->isGuest) {
+                \Yii::$app->user->logout();
             }
 
-            if ($level == self::AUTH_LEVEL_REQUIRED && !$identity) {
+            if ($level !== self::AUTH_LEVEL_NONE && !$identity) {
                 throw new UnauthorizedHttpException('Incorrect or expired token provided');
             };
         }
-
-        \Yii::$app->session->set($this->accessTokenPath, $token);
 
         return $identity;
     }
