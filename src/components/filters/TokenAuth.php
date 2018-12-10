@@ -65,6 +65,10 @@ class TokenAuth extends AuthMethod
         $token   = ArrayHelper::getValue($request, $this->accessTokenPath);
         $level   = $this->getAuthLevel(\Yii::$app->requestedAction);
 
+        if (!\Yii::$app->user->isGuest) {
+            \Yii::$app->user->logout();
+        }
+
         if ($level > self::AUTH_LEVEL_NONE && !empty($token)) {
             $identity = $user->loginByAccessToken($token);
 
