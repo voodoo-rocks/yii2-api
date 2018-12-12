@@ -44,5 +44,6 @@ class ModuleAssets extends AssetBundle
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
         'vr\api\doc\components\HighlightJsAssets',
+        'vr\api\doc\components\FontAwesomeAssets',
     ];
 }
