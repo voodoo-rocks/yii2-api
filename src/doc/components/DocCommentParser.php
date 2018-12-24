@@ -9,7 +9,6 @@
 namespace vr\api\doc\components;
 
 use yii\base\BaseObject;
-use yii\helpers\ArrayHelper;
 
 /**
  * Class DocCommentParser
@@ -40,6 +39,13 @@ class DocCommentParser extends BaseObject
      */
     public function getDescription()
     {
-        return trim(ArrayHelper::getValue(explode(PHP_EOL, $this->source), 1), " *");
+        $string = explode(PHP_EOL, $this->source);
+        $values = array_splice($string, 1);
+
+        array_walk($values, function (&$item) {
+            $item = trim($item, '* /\t\r\n');
+        });
+
+        return implode(array_filter($values), '<br/>');
     }
 }
