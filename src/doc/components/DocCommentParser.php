@@ -43,9 +43,15 @@ class DocCommentParser extends BaseObject
         $values = array_splice($string, 1);
 
         array_walk($values, function (&$item) {
-            $item = trim($item, '* /\t\r\n');
+            $item = trim($item, "* /\t\r\n");
         });
 
-        return implode(array_filter($values), '<br/>');
+        $filtered = array_filter($values, function ($string) {
+            return !empty($string)
+                   && strpos($string, '@throws') === false
+                   && strpos($string, '@return') === false;
+        });
+
+        return implode($filtered, '<br/>');
     }
 }
