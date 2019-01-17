@@ -24,7 +24,7 @@ use yii\helpers\Url;
     </div>
 
     <div class="col-sm-10">
-        <div class="row">
+        <div class="row bg-white sticky-top">
             <div class="col-sm-12">
                 <h4 class="float-left  pull-left">
                     <?php if ($model->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE): ?>
@@ -67,14 +67,14 @@ use yii\helpers\Url;
         </div>
 
         <div class="response-wrapper hidden">
-            <div class="row mt-3">
+            <div class="row mt-3 bg-white sticky-top">
                 <div class="col-sm-12">
                     <h4 class="float-left pull-left">
                         Response
                         <small>received in <span class="exec-time"></span> sec.</small>
                     </h4>
 
-                    <button class="btn btn-default btn-light float-right btn-xs pull-right" data-clipboard-target="#response-text">
+                    <button class="btn btn-default btn-light float-right btn-sm pull-right" data-clipboard-target="#response-text">
                         Copy
                     </button>
                 </div>
