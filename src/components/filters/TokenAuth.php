@@ -28,6 +28,11 @@ class TokenAuth extends AuthMethod
     /**
      *
      */
+    const DEFAULT_TOKEN_HEADER = 'X-Access-Token';
+
+    /**
+     *
+     */
     const AUTH_LEVEL_REQUIRED = 1;
 
     /**
@@ -46,6 +51,11 @@ class TokenAuth extends AuthMethod
     public $accessTokenPath = self::DEFAULT_TOKEN_PATH;
 
     /**
+     * @var string
+     */
+    public $accessTokenHeader = self::DEFAULT_TOKEN_HEADER;
+
+    /**
      * Authenticates the current user.
      *
      * @param \yii\web\User     $user
@@ -55,15 +65,17 @@ class TokenAuth extends AuthMethod
      * @return \yii\web\IdentityInterface the authenticated user identity. If authentication information is not
      *                                    provided, null will be returned.
      * @throws UnauthorizedHttpException if authentication information is provided but is invalid.
-     * @throws \yii\base\InvalidConfigException
      */
     public function authenticate($user, $request, $response)
     {
         $identity = null;
+        $token    = ArrayHelper::getValue($request->bodyParams, $this->accessTokenPath);
 
-        $request = $request->getBodyParams();
-        $token   = ArrayHelper::getValue($request, $this->accessTokenPath);
-        $level   = $this->getAuthLevel(\Yii::$app->requestedAction);
+        if (empty($token)) {
+            $token = ArrayHelper::getValue($request->headers, $this->accessTokenHeader);
+        }
+
+        $level = $this->getAuthLevel(\Yii::$app->requestedAction);
 
         if (!\Yii::$app->user->isGuest) {
             \Yii::$app->user->logout();
