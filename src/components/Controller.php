@@ -12,12 +12,14 @@ use vr\api\components\filters\TokenAuth;
 use vr\api\doc\components\Harvester;
 use vr\api\doc\controllers\DocController;
 use Yii;
+use yii\base\Exception;
 use yii\base\UserException;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\log\Logger;
 use yii\web\BadRequestHttpException;
+use yii\web\HttpException;
 use yii\web\Response;
 
 /**
@@ -177,20 +179,13 @@ class Controller extends \yii\rest\Controller
 
         try {
             return ['success' => true] + parent::runAction($id, $params) ?: [];
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (HttpException $e) {
+            Yii::$app->response->statusCode = $e->statusCode;
+
+            return $this->convertExceptionToArray($e);
         } catch (UserException $e) {
-
-            if ($e->getCode()) {
-                Yii::$app->response->setStatusCode($e->getCode());
-            }
-
-            return [
-                'success'   => false,
-                'exception' => $array = [
-                    'name'    => 'Exception',
-                    'message' => $e->getMessage(),
-                    'code'    => $e->getCode(),
-                ],
-            ];
+            return $this->convertExceptionToArray($e);
         }
     }
 
@@ -214,6 +209,23 @@ class Controller extends \yii\rest\Controller
         }
 
         return true;
+    }
+
+    /**
+     * @param Exception $e
+     *
+     * @return array
+     */
+    protected function convertExceptionToArray($e): array
+    {
+        return [
+            'success'   => false,
+            'exception' => $array = [
+                'name'    => 'Exception',
+                'message' => $e->getMessage(),
+                'code'    => $e->getCode(),
+            ],
+        ];
     }
 
     /**
