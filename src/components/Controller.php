@@ -17,7 +17,6 @@ use yii\base\UserException;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\log\Logger;
 use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\Response;
@@ -36,21 +35,23 @@ class Controller extends \yii\rest\Controller
      * @var null
      */
     public $authOnly = null;
-
     /**
      * @var array
      */
     public $authOptional = [];
-
     /**
      * @var bool
      */
     public $isAtomic = true;
-
     /**
      * @var bool
      */
     private $verbose = false;
+
+    public function actionOptions()
+    {
+        return null;
+    }
 
     /**
      * @return array
@@ -58,6 +59,9 @@ class Controller extends \yii\rest\Controller
     public function behaviors()
     {
         $filters = [
+            'corsFilter'        => [
+                'class' => \yii\filters\Cors::class,
+            ],
             'contentNegotiator' => [
                 'class'   => ContentNegotiator::class,
                 'formats' => [
@@ -69,7 +73,7 @@ class Controller extends \yii\rest\Controller
             'verbs'             => [
                 'class'   => VerbFilter::class,
                 'actions' => [
-                    '*' => ['post'],
+                    '*' => ['post', 'options', 'get'],
                 ],
             ],
             'authenticator'     => [
@@ -97,16 +101,6 @@ class Controller extends \yii\rest\Controller
     {
         $result = parent::afterAction($action, $result);
 
-        /** @noinspection PhpUndefinedFieldInspection */
-        if (Yii::$app->has('api') && Yii::$app->api->enableProfiling) {
-            list($count, $time) = Yii::getLogger()->getDbProfiling();
-
-            $message = sprintf('Database queries executed: %d, total time: %f sec', $count, $time);
-            Yii::getLogger()->log($message, Logger::LEVEL_PROFILE, 'database');
-
-            Yii::endProfile($action->uniqueId);
-        }
-
         if ($this->isAtomic && ($transaction = Yii::$app->db->getTransaction())) {
             $transaction->commit();
         }
@@ -125,21 +119,7 @@ class Controller extends \yii\rest\Controller
      */
     function beforeAction($action)
     {
-        /** @noinspection PhpUndefinedFieldInspection */
-        if (Yii::$app->has('api', true) && Yii::$app->api->enableProfiling) {
-            Yii::beginProfile($action->uniqueId);
-        }
-
-        if (\Yii::$app->request->method === 'OPTIONS') {
-            \Yii::$app->response->headers->add('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-            return false;
-        }
-
-        if (!parent::beforeAction($action)
-            && !Yii::$app->request->getIsGet()
-            && !$this->checkContentType()
-        ) {
+        if (!parent::beforeAction($action) && Yii::$app->request->isPost && !$this->checkContentType()) {
             return false;
         };
 
@@ -157,9 +137,14 @@ class Controller extends \yii\rest\Controller
      * @return mixed|string
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\base\InvalidRouteException
+     * @throws BadRequestHttpException
      */
     public function runAction($id, $params = [])
     {
+        if (Yii::$app->request->isOptions) {
+            return parent::runAction('options');
+        }
+
         if (Yii::$app->request->isGet) {
             $route = Yii::$app->requestedRoute;
 
@@ -177,16 +162,22 @@ class Controller extends \yii\rest\Controller
             return DocController::renderDocView($route);
         }
 
-        try {
-            return ['success' => true] + parent::runAction($id, $params) ?: [];
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (HttpException $e) {
-            Yii::$app->response->statusCode = $e->statusCode;
+        if (Yii::$app->request->isPost) {
+            try {
+                $data = parent::runAction($id, $params);
 
-            return $this->convertExceptionToArray($e);
-        } catch (UserException $e) {
-            return $this->convertExceptionToArray($e);
+                return array_merge(['success' => true], $data ?: []);
+            } /** @noinspection PhpRedundantCatchClauseInspection */
+            catch (HttpException $e) {
+                Yii::$app->response->statusCode = $e->statusCode;
+
+                return $this->convertExceptionToArray($e);
+            } catch (UserException $e) {
+                return $this->convertExceptionToArray($e);
+            }
         }
+
+        throw new BadRequestHttpException();
     }
 
     /**
@@ -197,15 +188,15 @@ class Controller extends \yii\rest\Controller
     private function checkContentType()
     {
         $contentType = ArrayHelper::getValue(explode(';', Yii::$app->request->getContentType()), 0);
-
-        $found = ArrayHelper::getValue(Yii::$app->get('request'),
+        $found       = ArrayHelper::getValue(Yii::$app->get('request'),
             ['parsers', $contentType]);
 
         if (!$found) {
             $acceptable = ArrayHelper::getValue(Yii::$app->get('request'), 'parsers', []);
 
-            throw new BadRequestHttpException('Incorrect content type. Following content types are acceptable: ' .
-                                              implode(',', array_keys($acceptable)));
+            throw new BadRequestHttpException(
+                'Incorrect content type. Following content types are acceptable: '
+                . implode(',', array_keys($acceptable)));
         }
 
         return true;
