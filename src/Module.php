@@ -72,7 +72,7 @@ class Module extends \yii\base\Module
         ]);
 
         Yii::$app->set('response', [
-            'class'      => '\vr\api\components\Response',
+            'class'      => '\yii\web\Response',
             'formatters' => [
                 Response::FORMAT_JSON => [
                     'class'         => '\vr\api\components\JsonResponseFormatter',

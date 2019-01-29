@@ -12,6 +12,7 @@ use vr\api\components\filters\TokenAuth;
 use vr\api\doc\components\Harvester;
 use vr\api\doc\controllers\DocController;
 use Yii;
+use yii\base\UserException;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -174,7 +175,23 @@ class Controller extends \yii\rest\Controller
             return DocController::renderDocView($route);
         }
 
-        return parent::runAction($id, $params);
+        try {
+            return ['success' => true] + parent::runAction($id, $params) ?: [];
+        } catch (UserException $e) {
+
+            if ($e->getCode()) {
+                Yii::$app->response->setStatusCode($e->getCode());
+            }
+
+            return [
+                'success'   => false,
+                'exception' => $array = [
+                    'name'    => 'Exception',
+                    'message' => $e->getMessage(),
+                    'code'    => $e->getCode(),
+                ],
+            ];
+        }
     }
 
     /**
