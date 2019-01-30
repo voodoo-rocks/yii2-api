@@ -7,6 +7,7 @@
 
 namespace vr\api;
 
+use vr\api\components\Controller;
 use vr\api\doc\components\Harvester;
 use Yii;
 use yii\base\Exception;
@@ -24,13 +25,6 @@ use yii\web\Response;
  */
 class Module extends \yii\base\Module
 {
-    /**
-     * @var array
-     */
-    public $controllerMap = [
-        'doc' => 'vr\api\doc\controllers\DocController',
-    ];
-
     public $hiddenMode = false;
 
     /**
@@ -47,19 +41,14 @@ class Module extends \yii\base\Module
             $user->loginUrl        = null;
         }
 
-        if (!YII_DEBUG) {
-            $this->controllerMap = [];
-        }
-
         $this->set('harvester', new Harvester());
-        $this->defaultRoute = 'doc/index';
+
+        $this->defaultRoute  = 'doc/index';
+        $this->controllerMap = [
+            'doc' => Controller::class,
+        ];
 
         Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
-
-        /** @noinspection PhpUndefinedFieldInspection */
-        if (YII_DEBUG || (Yii::$app->has('api') && Yii::$app->api->enableDocs)) {
-            $this->controllerMap['doc'] = 'vr\api\doc\controllers\DocController';
-        }
 
         Yii::$app->set('request', [
             'enableCookieValidation' => false,

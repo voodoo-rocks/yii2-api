@@ -56,6 +56,11 @@ class TokenAuth extends AuthMethod
     public $accessTokenHeader = self::DEFAULT_TOKEN_HEADER;
 
     /**
+     * @var array
+     */
+    public $verbs = ['POST', 'DELETE', 'PUT'];
+
+    /**
      * Authenticates the current user.
      *
      * @param \yii\web\User     $user
@@ -92,6 +97,11 @@ class TokenAuth extends AuthMethod
         return $identity;
     }
 
+    /**
+     * @param $response
+     *
+     * @throws UnauthorizedHttpException
+     */
     public function handleFailure($response)
     {
         if ($response->format != Response::FORMAT_HTML) {
@@ -111,5 +121,12 @@ class TokenAuth extends AuthMethod
         }
 
         return $this->isActive($action) ? self::AUTH_LEVEL_REQUIRED : self::AUTH_LEVEL_NONE;
+    }
+
+    protected function getActionId($action)
+    {
+        $parts = explode('/', $action->id);
+
+        return ArrayHelper::getValue($parts, count($parts) - 1);
     }
 }

@@ -8,7 +8,6 @@
 
 namespace vr\api\doc\widgets;
 
-use vr\api\doc\models\MetaModel;
 use yii\base\Widget;
 use yii\helpers\Json;
 
@@ -22,11 +21,6 @@ class InputParamsView extends Widget
      * @var
      */
     public $params;
-
-    /**
-     * @var bool
-     */
-    public $includeMeta = false;
 
     /**
      *
@@ -46,10 +40,6 @@ class InputParamsView extends Widget
         }
 
         $extra = [];
-
-        if ($this->includeMeta) {
-            $extra += ['meta' => new MetaModel()];
-        }
 
         return Json::encode($extra + $this->params, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }

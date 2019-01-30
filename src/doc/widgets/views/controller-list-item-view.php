@@ -1,4 +1,5 @@
 <?php
+
 use vr\api\doc\models\ControllerModel;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ListView;
@@ -12,17 +13,17 @@ use yii\widgets\ListView;
     </div>
     <?= ListView::widget([
         'dataProvider' => new ArrayDataProvider([
-            'allModels' => $model->getActions(),
+            'allModels' => $model->actions,
         ]),
-        'options' => [
+        'options'      => [
             'class' => 'list-group list-group-flush',
-            'tag' => 'div',
+            'tag'   => 'div',
         ],
-        'itemOptions' => [
-            'tag' => null,
+        'itemOptions'  => [
+            'tag'   => null,
             'class' => 'list-group-item',
         ],
-        'itemView' => 'action-list-item-view',
-        'layout' => '{items}',
+        'itemView'     => 'action-list-item-view',
+        'layout'       => '{items}',
     ]) ?>
 </div>

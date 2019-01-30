@@ -9,16 +9,12 @@ namespace vr\api\components;
 
 use vr\api\components\filters\ApiCheckerFilter;
 use vr\api\components\filters\TokenAuth;
-use vr\api\doc\components\Harvester;
-use vr\api\doc\controllers\DocController;
+use vr\api\doc\components\DocAction;
 use Yii;
-use yii\base\Exception;
-use yii\base\UserException;
 use yii\filters\ContentNegotiator;
+use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use yii\web\BadRequestHttpException;
-use yii\web\HttpException;
+use yii\rest\OptionsAction;
 use yii\web\Response;
 
 /**
@@ -31,10 +27,12 @@ class Controller extends \yii\rest\Controller
      * @var array
      */
     public $authExcept = [];
+
     /**
      * @var null
      */
     public $authOnly = null;
+
     /**
      * @var array
      */
@@ -43,15 +41,11 @@ class Controller extends \yii\rest\Controller
      * @var bool
      */
     public $isAtomic = true;
+
     /**
      * @var bool
      */
     private $verbose = false;
-
-    public function actionOptions()
-    {
-        return null;
-    }
 
     /**
      * @return array
@@ -59,8 +53,17 @@ class Controller extends \yii\rest\Controller
     public function behaviors()
     {
         $filters = [
-            'corsFilter'        => [
+            'verbs'             => [
+                'class'   => VerbFilter::class,
+                'actions' => [
+                    '*' => ['post', 'options', 'get'],
+                ],
+            ],
+            'cors'        => [
                 'class' => \yii\filters\Cors::class,
+            ],
+            'rateLimiter'       => [
+                'class' => RateLimiter::class,
             ],
             'contentNegotiator' => [
                 'class'   => ContentNegotiator::class,
@@ -70,24 +73,23 @@ class Controller extends \yii\rest\Controller
                     'text/html'        => Response::FORMAT_HTML,
                 ],
             ],
-            'verbs'             => [
-                'class'   => VerbFilter::class,
-                'actions' => [
-                    '*' => ['post', 'options', 'get'],
-                ],
-            ],
-            'authenticator'     => [
-                'class'    => TokenAuth::class,
-                'except'   => array_merge($this->authExcept ?: [], ['options']),
-                'only'     => $this->authOnly,
-                'optional' => $this->authOptional,
-            ],
             'apiChecker'        => [
                 'class' => ApiCheckerFilter::class,
             ],
         ];
 
-        return array_merge(parent::behaviors(), $filters);
+        if (Yii::$app->request->isPost || $this->verbose) {
+            $filters = array_merge($filters, [
+                'authenticator' => [
+                    'class'    => TokenAuth::class,
+                    'except'   => $this->authExcept,
+                    'only'     => $this->authOnly,
+                    'optional' => $this->authOptional,
+                ],
+            ]);
+        }
+
+        return $filters;
     }
 
     /**
@@ -115,11 +117,10 @@ class Controller extends \yii\rest\Controller
      *
      * @return bool
      * @throws \yii\web\BadRequestHttpException
-     * @throws \yii\base\InvalidConfigException
      */
     function beforeAction($action)
     {
-        if (!parent::beforeAction($action) && Yii::$app->request->isPost && !$this->checkContentType()) {
+        if (!parent::beforeAction($action)) {
             return false;
         };
 
@@ -130,93 +131,17 @@ class Controller extends \yii\rest\Controller
         return true;
     }
 
-    /**
-     * @param string $id
-     * @param array  $params
-     *
-     * @return mixed|string
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\base\InvalidRouteException
-     * @throws BadRequestHttpException
-     */
-    public function runAction($id, $params = [])
+    public function createAction($id)
     {
         if (Yii::$app->request->isOptions) {
-            return parent::runAction('options');
+            return new OptionsAction($id, $this);
         }
 
-        if (Yii::$app->request->isGet) {
-            $route = Yii::$app->requestedRoute;
-
-            /** @var Harvester $harvester */
-            $module    = \Yii::$app->controller->module;
-            $harvester = Yii::$app->controller->module->get('harvester');
-            $action    = $harvester->findAction($module, $route);
-
-            if (!$action) {
-                Yii::$app->session->addFlash('danger', "Action <b>{$route}</b> does not exist. You have been redirected to the home page");
-
-                return Yii::$app->controller->redirect(['doc/index']);
-            }
-
-            return DocController::renderDocView($route);
+        if (Yii::$app->request->isGet && !$this->verbose) {
+            return new DocAction($this->uniqueId . '/' . $id, $this);
         }
 
-        if (Yii::$app->request->isPost) {
-            try {
-                $data = parent::runAction($id, $params);
-
-                return array_merge(['success' => true], $data ?: []);
-            } /** @noinspection PhpRedundantCatchClauseInspection */
-            catch (HttpException $e) {
-                Yii::$app->response->statusCode = $e->statusCode;
-
-                return $this->convertExceptionToArray($e);
-            } catch (UserException $e) {
-                return $this->convertExceptionToArray($e);
-            }
-        }
-
-        throw new BadRequestHttpException();
-    }
-
-    /**
-     * @return bool
-     * @throws BadRequestHttpException
-     * @throws \yii\base\InvalidConfigException
-     */
-    private function checkContentType()
-    {
-        $contentType = ArrayHelper::getValue(explode(';', Yii::$app->request->getContentType()), 0);
-        $found       = ArrayHelper::getValue(Yii::$app->get('request'),
-            ['parsers', $contentType]);
-
-        if (!$found) {
-            $acceptable = ArrayHelper::getValue(Yii::$app->get('request'), 'parsers', []);
-
-            throw new BadRequestHttpException(
-                'Incorrect content type. Following content types are acceptable: '
-                . implode(',', array_keys($acceptable)));
-        }
-
-        return true;
-    }
-
-    /**
-     * @param Exception $e
-     *
-     * @return array
-     */
-    protected function convertExceptionToArray($e): array
-    {
-        return [
-            'success'   => false,
-            'exception' => $array = [
-                'name'    => 'Exception',
-                'message' => $e->getMessage(),
-                'code'    => $e->getCode(),
-            ],
-        ];
+        return parent::createAction($id);
     }
 
     /**
@@ -227,8 +152,8 @@ class Controller extends \yii\rest\Controller
      */
     public function getActionParams($action)
     {
-        $action        = $this->createAction($action);
         $this->verbose = true;
+        $action        = $this->createAction($action);
 
         try {
             $action->runWithParams([]);

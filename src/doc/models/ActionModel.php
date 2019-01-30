@@ -11,9 +11,7 @@ namespace vr\api\doc\models;
 use vr\api\components\Controller;
 use vr\api\components\filters\TokenAuth;
 use yii\base\Model;
-use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use yii\web\IdentityInterface;
 
 /**
  * Class Action
@@ -42,14 +40,14 @@ class ActionModel extends Model
     public $verbs;
 
     /**
+     * @var
+     */
+    public $authLevel;
+
+    /**
      * @var string
      */
     public $description;
-
-    /**
-     * @var ControllerModel
-     */
-    public $controllerModel = null;
 
     /**
      * @return array
@@ -57,64 +55,17 @@ class ActionModel extends Model
      */
     public function getInputParams()
     {
-
         /** @var Controller $instance */
-        $instance = $this->controllerModel->createInstance();
-        $params   = $instance->getActionParams($this->getId());
+        $instance = \Yii::$app->controller;
+        $params   = $instance->getActionParams($this->id) ?: [];
 
-        if (!$params) {
-            $params = [];
-        }
-
-        $tokenAttribute = ArrayHelper::getValue($instance->getBehavior('authenticator'), 'accessTokenPath');
-
-        if ($this->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE) {
-            $token = ArrayHelper::getValue($params, $tokenAttribute, \Yii::$app->session->get($tokenAttribute));
-
-            if (!$token && is_a(\Yii::$app->user->identityClass, '\yii\db\ActiveRecordInterface')) {
-                $object = \Yii::createObject(\Yii::$app->user->identityClass);
-
-                /** @var ActiveQuery $query */
-                $query = call_user_func([$object, 'find']);
-
-                /** @var IdentityInterface $identity */
-                if ($identity = $query->orderBy('rand()')->limit(1)->one()) {
-                    $token = $identity->getAuthKey();
-                }
-            }
-
-            $params = [$tokenAttribute => $token] + $params;
+        if ($this->authLevel > TokenAuth::AUTH_LEVEL_NONE) {
+            $params = [
+                          'accessToken' => ArrayHelper::getValue($params, 'accessToken'),
+                      ] + $params;
         }
 
         return $params;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getId()
-    {
-        $parts = explode('/', $this->route);
-
-        return ArrayHelper::getValue($parts, count($parts) - 1);
-    }
-
-    /**
-     * @return bool
-     */
-    public function getAuthLevel()
-    {
-        $controller = $this->controllerModel->createInstance();
-
-        /** @var TokenAuth $authenticator */
-        $authenticator = ArrayHelper::getValue($controller->behaviors, 'authenticator');
-        if (!$authenticator) {
-            return false;
-        }
-
-        $action = $controller->createAction($this->getId());
-
-        return $authenticator->getAuthLevel($action);
     }
 
     /**
@@ -123,5 +74,15 @@ class ActionModel extends Model
     public function getIsActive()
     {
         return \Yii::$app->requestedRoute == $this->route;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        $parts = explode('/', $this->route);
+
+        return ArrayHelper::getValue($parts, count($parts) - 1);
     }
 }

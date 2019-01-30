@@ -1,6 +1,8 @@
 <?php
+
 use vr\api\doc\components\Harvester;
 use vr\api\doc\components\ModuleAssets;
+use vr\api\doc\models\ModuleModel;
 use yii\bootstrap\Nav;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -38,11 +40,11 @@ ModuleAssets::register($this);
 /** @var Harvester $harvester */
 $harvester = Yii::$app->controller->module->get('harvester');
 
-$items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function ($module) {
+$items = ArrayHelper::getColumn($harvester->modules, function (ModuleModel $module) {
     return [
-        'label'  => $module,
-        'url'    => Url::to('@web/' . $module . '/doc/index'),
-        'active' => Yii::$app->controller->module->uniqueId == $module,
+        'label'  => $module->label,
+        'url'    => Url::to('@web/' . $module->label . '/doc/index'),
+        'active' => Yii::$app->controller->module->uniqueId == $module->label,
     ];
 }); ?>
 
@@ -61,19 +63,6 @@ $items = ArrayHelper::getColumn(array_keys($harvester->getModules()), function (
             'tag'   => 'div',
         ],
         'items'   => $items,
-    ]); ?>
-
-    <?= Nav::widget([
-        'options' => [
-            'class' => 'navbar-nav float-right pull-right ml-auto nav',
-        ],
-        'items'   => [
-            [
-                'label'  => ($active = Yii::$app->session->get('include-meta', false)) ? '+ Meta' : '- Meta',
-                'url'    => ['doc/toggle-meta'],
-                'active' => $active,
-            ],
-        ],
     ]); ?>
 </nav>
 

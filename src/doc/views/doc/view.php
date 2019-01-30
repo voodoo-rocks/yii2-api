@@ -1,15 +1,14 @@
 <?php
 
 use vr\api\components\filters\TokenAuth;
-use vr\api\doc\widgets\ControllersListView;
-use vr\api\doc\widgets\InputParamsView;
 use vr\api\doc\models\ActionModel;
 use vr\api\doc\models\ControllerModel;
+use vr\api\doc\widgets\ControllersListView;
+use vr\api\doc\widgets\InputParamsView;
 use yii\helpers\Url;
 
 /** @var ActionModel $model */
 /** @var ControllerModel[] $controllers */
-/** @var bool $includeMeta */
 
 ?>
 
@@ -26,13 +25,13 @@ use yii\helpers\Url;
     <div class="col-sm-10">
         <div class="row bg-white sticky-top">
             <div class="col-sm-12">
-                <h4 class="float-left  pull-left">
-                    <?php if ($model->getAuthLevel() > TokenAuth::AUTH_LEVEL_NONE): ?>
-                        <span class="glyphicon glyphicon-lock"></span>
+                <h4 class="float-left pull-left">
+                    <?php if ($model->authLevel == TokenAuth::AUTH_LEVEL_REQUIRED): ?>
+                        <span class="fa fa-lock"></span>
+                    <?php endif ?>
 
-                        <?php if ($model->getAuthLevel() == TokenAuth::AUTH_LEVEL_OPTIONAL): ?>
-                            (optional)
-                        <?php endif ?>
+                    <?php if ($model->authLevel == TokenAuth::AUTH_LEVEL_OPTIONAL): ?>
+                        <span class="fa fa-lock-open"></span>
                     <?php endif ?>
 
                     <?= $model->route ?>
@@ -60,8 +59,7 @@ use yii\helpers\Url;
 
                 <pre><code class="json editable bg-light" contenteditable="true" id="request-text"><?=
                         InputParamsView::widget([
-                            'params'      => $model->getInputParams(),
-                            'includeMeta' => $includeMeta,
+                            'params' => $model->getInputParams(),
                         ]) ?></code></pre>
             </div>
         </div>
@@ -74,7 +72,8 @@ use yii\helpers\Url;
                         <small>received in <span class="exec-time"></span> sec.</small>
                     </h4>
 
-                    <button class="btn btn-default btn-light float-right btn-sm pull-right" data-clipboard-target="#response-text">
+                    <button class="btn btn-default btn-light float-right btn-sm pull-right"
+                            data-clipboard-target="#response-text">
                         Copy
                     </button>
                 </div>

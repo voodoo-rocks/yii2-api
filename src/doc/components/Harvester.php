@@ -8,73 +8,72 @@
 
 namespace vr\api\doc\components;
 
+use ReflectionMethod;
+use vr\api\components\Controller;
+use vr\api\components\filters\TokenAuth;
+use vr\api\doc\models\ActionModel;
 use vr\api\doc\models\ControllerModel;
+use vr\api\doc\models\ModuleModel;
 use vr\core\Inflector;
 use Yii;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
+use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 
 /**
  * Class Harvester
  * @package vr\api\doc\components
+ * @property array $modules
  */
 class Harvester extends Component
 {
+    /**
+     * @var array
+     */
+    private $_modules = [];
+
     /**
      * @param yii\base\Module $root
      * @param string          $path
      *
      * @return array
+     * @throws \ReflectionException
      */
-    public function getModules($root = null, $path = null)
+    public function fetchModules($root = null, $path = null)
     {
-        if (!$root) {
-            $root = Yii::$app;
-        }
+        $root = $root ?: Yii::$app;
 
-        $modules = [];
-
-        foreach ($root->getModules() as $alias => $module) {
-
+        foreach ($root->getModules() as $alias => $id) {
             $instance = $root->getModule($alias);
 
             if (is_subclass_of($instance, \vr\api\Module::class)) {
                 $relative = array_merge($path ? explode('/', $path) : [], [$alias]);
 
                 /** @noinspection PhpDeprecationInspection */
-                $modules[implode('/', $relative)] = $instance->className();
-                $modules                          = array_merge($modules, $this->getModules($instance, $alias));
+                $module              = new ModuleModel([
+                    'label' => implode('/', $relative),
+                    'path'  => $relative,
+                ]);
+                $module->controllers = $this->fetchControllers($instance);
+
+                $this->_modules[$alias] = $module;
+                $this->_modules                 =
+                    array_merge($this->_modules, $this->fetchModules($instance, $alias));
             }
         }
 
-        return $modules;
-    }
-
-    /**
-     * @param yii\base\Module $module
-     * @param string          $route
-     *
-     * @return null
-     */
-    public function findAction($module, $route)
-    {
-        /** @var ControllerModel $controller */
-        foreach ($this->getControllers($module) as $controller) {
-            if ($action = $controller->findAction($route)) {
-                return $action;
-            }
-        }
-
-        return null;
+        return $this->_modules;
     }
 
     /**
      * @param yii\base\Module $module
      *
      * @return array
+     * @throws \ReflectionException
      */
-    public function getControllers($module)
+    public function fetchControllers($module)
     {
         $files = FileHelper::findFiles($module->controllerPath, ['only' => ['*Controller.php']]);
 
@@ -90,9 +89,7 @@ class Harvester extends Component
                 'label' => Inflector::camel2words($class),
             ]);
 
-            if (!$controller->loadActions()) {
-                continue;
-            }
+            $this->fetchActions($controller);
 
             if ($controller->isActive) {
                 $activeController = $controller;
@@ -109,4 +106,114 @@ class Harvester extends Component
 
         return $controllers;
     }
+
+    /**
+     * @param ControllerModel $controller
+     *
+     * @throws \ReflectionException
+     */
+    private function fetchActions(ControllerModel $controller)
+    {
+        try {
+            /** @var Controller $instance */
+            list($instance) = \Yii::$app->createController($controller->route);
+        } catch (InvalidConfigException $exception) {
+            return;
+        }
+
+        $reflection = new \ReflectionClass($instance);
+
+        /** @var VerbFilter $filter */
+        $filter = ArrayHelper::getValue($instance->behaviors(), 'verbs');
+
+        /** @var ReflectionMethod $method */
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if ($route = $this->extractActionRoute($method)) {
+
+                $docParser = new DocCommentParser([
+                    'source' => $method->getDocComment(),
+                ]);
+
+                $action = new ActionModel([
+                    'verbs'       => $filter ? ArrayHelper::getValue($filter, ['actions', $route], []) : ['get'],
+                    'route'       => $controller->route . '/' . $route,
+                    'description' => $docParser->getDescription(),
+                    'label'       => Inflector::camel2words($route),
+                ]);
+
+                $this->updateActionAuthLevel($instance, $action);
+
+                $controller->actions[] = $action;
+            }
+        }
+
+        ArrayHelper::multisort($controller->actions, 'label');
+    }
+
+    /**
+     * @param ReflectionMethod $method
+     *
+     * @return null|string
+     */
+    private function extractActionRoute(ReflectionMethod $method)
+    {
+        if (substr($method->getName(), 0, strlen('action')) == 'action'
+            && $method->getName() != 'actions'
+        ) {
+            return Inflector::camel2id(substr($method->getName(), strlen('action')));
+        }
+
+        return null;
+    }
+
+    /**
+     * @param Controller  $instance
+     * @param ActionModel $action
+     */
+    private function updateActionAuthLevel($instance, $action)
+    {
+        $filter = new TokenAuth([
+            'except'   => $instance->authExcept,
+            'optional' => $instance->authOptional,
+            'only'     => $instance->authOnly,
+        ]);
+
+        $actionInstance = $instance->createAction($action->id);
+        $level          = $filter->getAuthLevel($actionInstance);
+
+        $action->authLevel = $level;
+    }
+
+    /**
+     * @param yii\base\Module $module
+     * @param string          $route
+     *
+     * @return ActionModel|null
+     * @throws \ReflectionException
+     */
+    public function findAction($module, $route)
+    {
+        /** @var ControllerModel $controller */
+        foreach ($this->fetchControllers($module) as $controller) {
+            if ($action = $controller->findAction($route)) {
+                return $action;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getModules(): array
+    {
+        return $this->_modules;
+    }
+
+    public function getControllers(\yii\base\Module $module)
+    {
+        return $this->_modules[$module->uniqueId]->controllers;
+    }
+
 }
