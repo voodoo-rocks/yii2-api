@@ -78,7 +78,7 @@ class Controller extends \yii\rest\Controller
             ],
             'authenticator'     => [
                 'class'    => TokenAuth::class,
-                'except'   => $this->authExcept,
+                'except'   => array_merge($this->authExcept ?: [], ['options']),
                 'only'     => $this->authOnly,
                 'optional' => $this->authOptional,
             ],
