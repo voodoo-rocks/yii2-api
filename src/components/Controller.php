@@ -59,7 +59,7 @@ class Controller extends \yii\rest\Controller
                     '*' => ['post', 'options', 'get'],
                 ],
             ],
-            'cors'        => [
+            'cors'              => [
                 'class' => \yii\filters\Cors::class,
             ],
             'rateLimiter'       => [
@@ -141,6 +141,13 @@ class Controller extends \yii\rest\Controller
             return new DocAction($this->uniqueId . '/' . $id, $this);
         }
 
+        if (Yii::$app->request->isPost) {
+            $methodName = 'action' . str_replace(' ', '',
+                    ucwords(str_replace('-', ' ', $id)));
+
+            return new ApiAction($id, $this, $methodName);
+        }
+
         return parent::createAction($id);
     }
 
@@ -164,6 +171,31 @@ class Controller extends \yii\rest\Controller
 
         return null;
     }
+
+//    /**
+//     * @param array $params
+//     *
+//     * @return array|mixed
+//     * @throws \yii\base\InvalidConfigException
+//     */
+//    public function runWithParams($params)
+//    {
+//        try {
+//            $data = parent::runWithParams($params);
+//
+//            return array_merge(['success' => true], $data ?: []);
+//        } /** @noinspection PhpRedundantCatchClauseInspection */
+//        catch (HttpException $e) {
+//            Yii::$app->response->statusCode = $e->statusCode;
+//
+//            return $this->convertExceptionToArray($e);
+//        } /** @noinspection PhpRedundantCatchClauseInspection */
+//        catch (UserException $e) {
+//            Yii::$app->response->statusCode = $this->validationFailedStatusCode;
+//
+//            return $this->convertExceptionToArray($e);
+//        }
+//    }
 
     /**
      * @param $callable

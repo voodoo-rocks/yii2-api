@@ -8,17 +8,15 @@
 
 namespace vr\api\components;
 
-use Yii;
-use yii\base\Action;
+use vr\core\ErrorsException;
 use yii\base\Exception;
-use yii\base\UserException;
-use yii\web\HttpException;
+use yii\base\InlineAction;
 
 /**
  * Class ApiAction
  * @package vr\api\components
  */
-class ApiAction extends Action
+class ApiAction extends InlineAction
 {
     /**
      * @var int
@@ -39,12 +37,17 @@ class ApiAction extends Action
             return array_merge(['success' => true], $data ?: []);
         } /** @noinspection PhpRedundantCatchClauseInspection */
         catch (HttpException $e) {
-            Yii::$app->response->statusCode = $e->statusCode;
+            \Yii::$app->response->statusCode = $e->statusCode;
 
             return $this->convertExceptionToArray($e);
         } /** @noinspection PhpRedundantCatchClauseInspection */
         catch (UserException $e) {
-            Yii::$app->response->statusCode = $this->validationFailedStatusCode;
+            \Yii::$app->response->statusCode = $this->validationFailedStatusCode;
+
+            return $this->convertExceptionToArray($e);
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (ErrorsException $e) {
+            \Yii::$app->response->statusCode = $this->validationFailedStatusCode;
 
             return $this->convertExceptionToArray($e);
         }
