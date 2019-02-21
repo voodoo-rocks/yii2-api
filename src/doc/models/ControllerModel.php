@@ -26,7 +26,10 @@ class ControllerModel extends Model
      */
     public $description;
 
-    public $actions;
+    /**
+     * @var
+     */
+    public $actions = [];
 
     /**
      * @param $route
