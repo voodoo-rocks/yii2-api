@@ -10,6 +10,7 @@ namespace vr\api\doc\components;
 
 use Yii;
 use yii\base\Action;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class DocAction
@@ -65,10 +66,15 @@ class DocAction extends Action
      */
     private function render($view, $params)
     {
-        $content = Yii::$app->getView()->render($view, $params, $this);
+        $currentView = Yii::$app->getView();
+        $title       = ArrayHelper::getValue($params, ['model', 'label']);
+
+        $currentView->title = trim("{$title} | " . Yii::$app->name, ' |');
+
+        $content = $currentView->render($view, $params, $this);
         $layout  = Yii::getAlias($this->layout) . '.php';
 
-        return Yii::$app->getView()->renderFile($layout, ['content' => $content], $this);
+        return $currentView->renderFile($layout, ['content' => $content], $this);
     }
 
     /**
