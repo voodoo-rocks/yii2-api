@@ -4,6 +4,7 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
+
 namespace vr\api\components;
 
 use yii\base\Component;
@@ -12,6 +13,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Class Api
  * @package vr\api\components
+ * @property string $randomKey
  */
 class Api extends Component
 {

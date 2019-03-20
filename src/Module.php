@@ -4,9 +4,11 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
+
 namespace vr\api;
 
-use vr\api\components\Harvester;
+use vr\api\components\Controller;
+use vr\api\doc\components\Harvester;
 use Yii;
 use yii\base\Exception;
 use yii\web\Request;
@@ -15,16 +17,14 @@ use yii\web\Response;
 /**
  * Class Module
  * @package vr\api
+ * How to set it up
+ *          1. Add the following line to your .htaccess
+ *              Header set Access-Control-Allow-Origin "*"
+ *          2. Replace * with real URLs to prevent security breaches
+ *          3.
  */
 class Module extends \yii\base\Module
 {
-    /**
-     * @var array
-     */
-    public $controllerMap = [
-        'doc' => 'vr\api\controllers\DocController',
-    ];
-
     public $hiddenMode = false;
 
     /**
@@ -34,42 +34,38 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        if ($user = \Yii::$app->user) {
-            $user->enableSession = false;
+        if (\Yii::$container->has('user')) {
+            $user                  = \Yii::$app->user;
+            $user->enableSession   = false;
             $user->enableAutoLogin = false;
-            $user->loginUrl = null;
-        }
-
-        if (!YII_DEBUG) {
-            $this->controllerMap = [];
+            $user->loginUrl        = null;
         }
 
         $this->set('harvester', new Harvester());
-        $this->defaultRoute = 'doc/index';
+
+        $this->defaultRoute  = 'doc/index';
+        $this->controllerMap = [
+            'doc' => Controller::class,
+        ];
 
         Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
 
-        /** @noinspection PhpUndefinedFieldInspection */
-        if (YII_DEBUG || (Yii::$app->has('api') && Yii::$app->api->enableDocs)) {
-            $this->controllerMap['doc'] = 'vr\api\controllers\DocController';
-        }
-
         Yii::$app->set('request', [
             'enableCookieValidation' => false,
-            'enableCsrfValidation' => false,
+            'enableCsrfValidation'   => false,
 
-            'class' => Request::className(),
+            'class'   => Request::class,
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ],
         ]);
 
         Yii::$app->set('response', [
-            'class' => '\vr\api\components\Response',
+            'class'      => '\yii\web\Response',
             'formatters' => [
                 Response::FORMAT_JSON => [
-                    'class' => '\vr\api\components\JsonResponseFormatter',
-                    'prettyPrint' => YII_DEBUG, // use "pretty" output in debug mode
+                    'class'         => '\vr\api\components\JsonResponseFormatter',
+                    'prettyPrint'   => YII_DEBUG, // use "pretty" output in debug mode
                     'encodeOptions' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
                 ],
             ],

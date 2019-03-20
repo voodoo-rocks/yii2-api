@@ -8,7 +8,6 @@
 
 namespace vr\api\components;
 
-
 use vr\core\Inflector;
 use yii\helpers\ArrayHelper;
 use yii\helpers\BaseJson;
@@ -20,21 +19,22 @@ use yii\helpers\BaseJson;
 class Json extends BaseJson
 {
     /**
-     * @param mixed $data
-     * @param array $expressions
+     * @param mixed  $data
+     * @param array  $expressions
      * @param string $expPrefix
+     *
      * @return mixed
      */
     protected static function processData($data, &$expressions, $expPrefix)
     {
         $processed = parent::processData($data, $expressions, $expPrefix);
 
-
         return self::reformatKeys($processed);
     }
 
     /**
      * @param $data
+     *
      * @return mixed
      */
     private static function reformatKeys($data)
@@ -51,6 +51,5 @@ class Json extends BaseJson
 
         return $data;
     }
-
 
 }

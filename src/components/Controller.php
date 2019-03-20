@@ -4,18 +4,17 @@
  * @link      https://voodoo.rocks
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
+
 namespace vr\api\components;
 
 use vr\api\components\filters\ApiCheckerFilter;
 use vr\api\components\filters\TokenAuth;
-use vr\api\controllers\DocController;
-use vr\api\Module;
+use vr\api\doc\components\DocAction;
 use Yii;
 use yii\filters\ContentNegotiator;
+use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use yii\log\Logger;
-use yii\web\BadRequestHttpException;
+use yii\rest\OptionsAction;
 use yii\web\Response;
 
 /**
@@ -28,6 +27,7 @@ class Controller extends \yii\rest\Controller
      * @var array
      */
     public $authExcept = [];
+
     /**
      * @var null
      */
@@ -37,6 +37,10 @@ class Controller extends \yii\rest\Controller
      * @var array
      */
     public $authOptional = [];
+    /**
+     * @var bool
+     */
+    public $isAtomic = true;
 
     /**
      * @var bool
@@ -49,52 +53,58 @@ class Controller extends \yii\rest\Controller
     public function behaviors()
     {
         $filters = [
-            'apiChecker' => [
-                'class' => ApiCheckerFilter::className(),
+            'verbs'             => [
+                'class'   => VerbFilter::class,
+                'actions' => [
+                    '*' => ['post', 'options', 'get'],
+                ],
             ],
-            'authenticator' => [
-                'class' => TokenAuth::className(),
-                'except' => $this->authExcept,
-                'only' => $this->authOnly,
-                'optional' => $this->authOptional,
+            'cors'              => [
+                'class' => \yii\filters\Cors::class,
+            ],
+            'rateLimiter'       => [
+                'class' => RateLimiter::class,
             ],
             'contentNegotiator' => [
-                'class' => ContentNegotiator::className(),
+                'class'   => ContentNegotiator::class,
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
-                    'application/xml' => Response::FORMAT_XML,
-                    'text/html' => Response::FORMAT_HTML,
+                    'application/xml'  => Response::FORMAT_XML,
+                    'text/html'        => Response::FORMAT_HTML,
                 ],
             ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    '*' => ['post', 'get'],
-                ],
+            'apiChecker'        => [
+                'class' => ApiCheckerFilter::class,
             ],
         ];
 
-        return array_merge(parent::behaviors(), $filters);
+        if (Yii::$app->request->isPost || $this->verbose) {
+            $filters = array_merge($filters, [
+                'authenticator' => [
+                    'class'    => TokenAuth::class,
+                    'except'   => $this->authExcept,
+                    'only'     => $this->authOnly,
+                    'optional' => $this->authOptional,
+                ],
+            ]);
+        }
+
+        return $filters;
     }
 
     /**
      * @param \yii\base\Action $action
-     * @param mixed $result
+     * @param mixed            $result
      *
      * @return mixed
+     * @throws \yii\db\Exception
      */
     public function afterAction($action, $result)
     {
         $result = parent::afterAction($action, $result);
 
-        /** @noinspection PhpUndefinedFieldInspection */
-        if (Yii::$app->has('api') && Yii::$app->api->enableProfiling) {
-            list($count, $time) = Yii::getLogger()->getDbProfiling();
-
-            $message = sprintf('Database queries executed: %d, total time: %f sec', $count, $time);
-            Yii::getLogger()->log($message, Logger::LEVEL_PROFILE, 'database');
-
-            Yii::endProfile($action->uniqueId);
+        if ($this->isAtomic && ($transaction = Yii::$app->db->getTransaction())) {
+            $transaction->commit();
         }
 
         return $result;
@@ -110,96 +120,82 @@ class Controller extends \yii\rest\Controller
      */
     function beforeAction($action)
     {
-        /** @noinspection PhpUndefinedFieldInspection */
-        if (Yii::$app->has('api', true) && Yii::$app->api->enableProfiling) {
-            Yii::beginProfile($action->uniqueId);
-        }
-
-        if (!parent::beforeAction($action)
-            && !Yii::$app->request->getIsGet()
-            && !$this->checkContentType()
-        ) {
+        if (!parent::beforeAction($action)) {
             return false;
         };
 
+        if ($this->isAtomic) {
+            Yii::$app->db->beginTransaction();
+        }
 
         return true;
     }
 
-    /**
-     * @return bool
-     * @throws BadRequestHttpException
-     */
-    private function checkContentType()
+    public function createAction($id)
     {
-        $contentType = ArrayHelper::getValue(explode(';', Yii::$app->request->getContentType()), 0);
-
-        $found = ArrayHelper::getValue(Yii::$app->get('request'),
-            ['parsers', $contentType]);
-
-        if (!$found) {
-            $acceptable = ArrayHelper::getValue(Yii::$app->get('request'), 'parsers', []);
-
-            throw new BadRequestHttpException('Incorrect content type. Following content types are acceptable: ' .
-                implode(',', array_keys($acceptable)));
+        if (Yii::$app->request->isOptions) {
+            return new OptionsAction($id, $this);
         }
 
-        return true;
+        if (Yii::$app->request->isGet && !$this->verbose) {
+            return new DocAction($this->uniqueId . '/' . $id, $this);
+        }
+
+        if (Yii::$app->request->isPost) {
+            $methodName = 'action' . str_replace(' ', '',
+                    ucwords(str_replace('-', ' ', $id)));
+
+            return new ApiAction($id, $this, $methodName);
+        }
+
+        return parent::createAction($id);
     }
 
     /**
      * @param $action
      *
      * @return null|array
+     * @throws \yii\base\InvalidConfigException
      */
     public function getActionParams($action)
     {
-        $action = $this->createAction($action);
         $this->verbose = true;
+        $action        = $this->createAction($action);
 
         try {
             $action->runWithParams([]);
-        } catch (VerboseException $exception) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (VerboseException $exception) {
             return $exception->params;
         }
 
         return null;
     }
 
-    public function runAction($id, $params = [])
-    {
-        if (Yii::$app->request->isGet) {
-            $route = Yii::$app->requestedRoute;
-
-            /** @var Harvester $harvester */
-            $module = \Yii::$app->controller->module;
-            $harvester = Yii::$app->controller->module->get('harvester');
-            $action = $harvester->findAction($module, $route);
-
-            if ($action) {
-                return $this->renderDocView($route);
-            }
-        }
-
-        return parent::runAction($id, $params); // TODO: Change the autogenerated stub
-    }
-
-    private function renderDocView($route)
-    {
-        /** @var Harvester $harvester */
-        $harvester = Yii::$app->controller->module->get('harvester');
-
-        /** @var Module $module */
-        $module = \Yii::$app->controller->module;
-
-        $controllers = $harvester->getControllers($module);
-
-        return (new DocController('doc', $module))->render('@api/views/doc/view', [
-            'controllers' => $controllers,
-            'model' => $harvester->findAction($module, $route),
-            'includeMeta' => Yii::$app->session->get('include-meta', false),
-        ]);
-    }
+//    /**
+//     * @param array $params
+//     *
+//     * @return array|mixed
+//     * @throws \yii\base\InvalidConfigException
+//     */
+//    public function runWithParams($params)
+//    {
+//        try {
+//            $data = parent::runWithParams($params);
+//
+//            return array_merge(['success' => true], $data ?: []);
+//        } /** @noinspection PhpRedundantCatchClauseInspection */
+//        catch (HttpException $e) {
+//            Yii::$app->response->statusCode = $e->statusCode;
+//
+//            return $this->convertExceptionToArray($e);
+//        } /** @noinspection PhpRedundantCatchClauseInspection */
+//        catch (UserException $e) {
+//            Yii::$app->response->statusCode = $this->validationFailedStatusCode;
+//
+//            return $this->convertExceptionToArray($e);
+//        }
+//    }
 
     /**
      * @param $callable

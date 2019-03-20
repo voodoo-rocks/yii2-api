@@ -8,6 +8,8 @@
 
 namespace vr\api\components;
 
+use yii\web\Response;
+
 /**
  * Class JsonResponseFormatter
  * @package vr\api\components
@@ -16,6 +18,7 @@ class JsonResponseFormatter extends \yii\web\JsonResponseFormatter
 {
     /**
      * Formats response data in JSON format.
+     *
      * @param Response $response
      */
     protected function formatJson($response)
