@@ -31,6 +31,7 @@ $(document).ready(function () {
             },
             complete    : function (data) {
                 var totalTime = (new Date().getTime() - ajaxTime) / 1000;
+                $('.response-status').text(' status: '+ data.status +',');
                 $('.exec-time').text(totalTime);
                 $('.response-wrapper').removeClass('hidden');
                 $('.response-block .json').each(function (i, block) {

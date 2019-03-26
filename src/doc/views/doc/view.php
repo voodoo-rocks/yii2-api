@@ -69,6 +69,7 @@ use yii\helpers\Url;
                 <div class="col-sm-12">
                     <h4 class="float-left pull-left">
                         Response
+                        <small class="response-status"></small>
                         <small>received in <span class="exec-time"></span> sec.</small>
                     </h4>
 
