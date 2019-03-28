@@ -11,6 +11,7 @@ use vr\api\components\Controller;
 use vr\api\doc\components\Harvester;
 use Yii;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 use yii\web\Request;
 use yii\web\Response;
 
@@ -34,7 +35,10 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        if (\Yii::$container->has('user')) {
+        $definitions = \Yii::$app->getComponents(true);
+        $setUp       = ArrayHelper::getValue($definitions, ['user', 'identityClass']);
+        
+        if (!empty($setUp)) {
             $user                  = \Yii::$app->user;
             $user->enableSession   = false;
             $user->enableAutoLogin = false;
