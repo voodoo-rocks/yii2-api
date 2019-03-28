@@ -11,6 +11,8 @@ namespace vr\api\components;
 use vr\core\ErrorsException;
 use yii\base\Exception;
 use yii\base\InlineAction;
+use yii\base\UserException;
+use yii\web\HttpException;
 
 /**
  * Class ApiAction
@@ -41,12 +43,12 @@ class ApiAction extends InlineAction
 
             return $this->convertExceptionToArray($e);
         } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (UserException $e) {
+        catch (ErrorsException $e) {
             \Yii::$app->response->statusCode = $this->validationFailedStatusCode;
 
-            return $this->convertExceptionToArray($e);
+            return $this->convertExceptionToArray($e, $e->data);
         } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (ErrorsException $e) {
+        catch (UserException $e) {
             \Yii::$app->response->statusCode = $this->validationFailedStatusCode;
 
             return $this->convertExceptionToArray($e);
@@ -58,7 +60,7 @@ class ApiAction extends InlineAction
      *
      * @return array
      */
-    protected function convertExceptionToArray($e): array
+    protected function convertExceptionToArray($e, $data = []): array
     {
         return [
             'success'   => false,
@@ -66,6 +68,7 @@ class ApiAction extends InlineAction
                 'name'    => 'Exception',
                 'message' => $e->getMessage(),
                 'code'    => $e->getCode(),
+                'data'    => $data,
             ],
         ];
     }
