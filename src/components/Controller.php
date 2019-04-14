@@ -44,6 +44,8 @@ class Controller extends \yii\rest\Controller
      */
     public $isAtomic = true;
 
+    public $requestedAt;
+
     /**
      * @var bool
      */
@@ -134,6 +136,8 @@ class Controller extends \yii\rest\Controller
      */
     function beforeAction($action)
     {
+        $this->requestedAt = microtime(true);
+
         if (!parent::beforeAction($action)) {
             return false;
         };
