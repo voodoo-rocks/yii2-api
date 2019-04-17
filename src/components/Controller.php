@@ -116,8 +116,6 @@ class Controller extends \yii\rest\Controller
         $result = parent::afterAction($action, $result);
 
         if ($this->isAtomic
-            && is_array($result)
-            && ArrayHelper::getValue($result, 'success', false)
             && Yii::$app->has('db')
             && ($transaction = Yii::$app->db->getTransaction())) {
             $transaction->commit();
