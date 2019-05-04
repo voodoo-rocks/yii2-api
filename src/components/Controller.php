@@ -39,17 +39,21 @@ class Controller extends \yii\rest\Controller
      * @var array
      */
     public $authOptional = [];
+
     /**
      * @var bool
      */
     public $isAtomic = true;
 
+    /**
+     * @var
+     */
     public $requestedAt;
 
     /**
      * @var bool
      */
-    private $verbose = false;
+    protected $verbose = false;
 
     /**
      * @return array
@@ -147,6 +151,11 @@ class Controller extends \yii\rest\Controller
         return true;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return null|ApiAction|DocAction|\yii\base\Action|OptionsAction
+     */
     public function createAction($id)
     {
         if (Yii::$app->request->isOptions) {
