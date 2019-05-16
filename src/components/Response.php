@@ -41,8 +41,8 @@ class Response extends \yii\web\Response
      *
      * @param \Exception|\Error $e the exception object.
      *
-     * @throws InvalidArgumentException if the status code is invalid.
      * @return $this the response object itself
+     * @throws InvalidArgumentException if the status code is invalid.
      * @since 2.0.12
      */
     public function setStatusCodeByException($e)
@@ -74,14 +74,16 @@ class Response extends \yii\web\Response
 
         /** @var Controller $controller */
         $controller = Yii::$app->controller;
-        $response->data       += [
-            '_execution' => [
-                'responseCode'   => $response->statusCode,
-                'responseStatus' => $response->statusText,
-                'timestamp'      => DateTime::createFromFormat('U', (int)$controller->requestedAt)
-                    ->format('Y-m-d H:i:s'),
-                'executionTime'  => round(microtime(true) - $controller->requestedAt, 3),
-            ],
-        ];
+        if ($controller->includeExecInfo) {
+            $response->data += [
+                '_execution' => [
+                    'responseCode'   => $response->statusCode,
+                    'responseStatus' => $response->statusText,
+                    'timestamp'      => DateTime::createFromFormat('U', (int)$controller->requestedAt)
+                        ->format('Y-m-d H:i:s'),
+                    'executionTime'  => round(microtime(true) - $controller->requestedAt, 3),
+                ],
+            ];
+        }
     }
 }

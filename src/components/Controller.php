@@ -53,6 +53,11 @@ class Controller extends \yii\rest\Controller
     /**
      * @var bool
      */
+    public $includeExecInfo = true;
+
+    /**
+     * @var bool
+     */
     protected $verbose = false;
 
     /**
