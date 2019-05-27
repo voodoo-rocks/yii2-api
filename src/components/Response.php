@@ -57,7 +57,7 @@ class Response extends \yii\web\Response
     /**
      * @param Response $response
      */
-    function handleJsonResponse(Response $response)
+    protected function handleJsonResponse(Response $response)
     {
         if (!$response->data) {
             $response->data = [];
