@@ -36,7 +36,7 @@ class Harvester extends Component
 
     /**
      * @param yii\base\Module $root
-     * @param string          $path
+     * @param string $path
      *
      * @return array
      * @throws \ReflectionException
@@ -59,7 +59,7 @@ class Harvester extends Component
                 $module->controllers = $this->fetchControllers($instance);
 
                 $this->_modules[$alias] = $module;
-                $this->_modules                 =
+                $this->_modules         =
                     array_merge($this->_modules, $this->fetchModules($instance, $alias));
             }
         }
@@ -75,33 +75,39 @@ class Harvester extends Component
      */
     public function fetchControllers($module)
     {
-        $files = FileHelper::findFiles($module->controllerPath, ['only' => ['*Controller.php']]);
+        $controllers = [];
 
-        $controllers      = [];
-        $activeController = null;
+        foreach ($module->controllerMap as $route => $class) {
+            $controllers[] = new ControllerModel([
+                'route' => $module->uniqueId . '/' . $route,
+                'label' => Inflector::camel2words($route),
+            ]);
+        }
+
+        $files = FileHelper::findFiles($module->controllerPath, ['only' => ['*Controller.php']]);
 
         foreach ($files as $file) {
             $class = pathinfo($file, PATHINFO_FILENAME);
             $route = Inflector::camel2id($class = substr($class, 0, strlen($class) - strlen('Controller')));
 
-            $controller = new ControllerModel([
+            $controllers[] = new ControllerModel([
                 'route' => $module->uniqueId . '/' . $route,
                 'label' => Inflector::camel2words($class),
             ]);
-
-            $this->fetchActions($controller);
-
-            if ($controller->isActive) {
-                $activeController = $controller;
-            } else {
-                $controllers = array_merge($controllers, [$controller]);
-            }
         }
 
         ArrayHelper::multisort($controllers, 'label');
 
-        if ($activeController) {
-            $controllers = array_merge([$activeController], $controllers);
+        foreach ($controllers as $index => $controller) {
+            if (!$this->fetchActions($controller)) {
+                unset($controllers[$index]);
+                continue;
+            };
+
+            if ($controller->isActive) {
+                unset($controllers[$index]);
+                array_unshift($controllers, $controller);
+            }
         }
 
         return $controllers;
@@ -109,7 +115,7 @@ class Harvester extends Component
 
     /**
      * @param ControllerModel $controller
-     *
+     * @return int
      * @throws \ReflectionException
      */
     private function fetchActions(ControllerModel $controller)
@@ -118,7 +124,7 @@ class Harvester extends Component
             /** @var Controller $instance */
             list($instance) = \Yii::$app->createController($controller->route);
         } catch (InvalidConfigException $exception) {
-            return;
+            return 0;
         }
 
         $reflection = new \ReflectionClass($instance);
@@ -148,6 +154,8 @@ class Harvester extends Component
         }
 
         ArrayHelper::multisort($controller->actions, 'label');
+
+        return count($controller->actions);
     }
 
     /**
@@ -167,7 +175,7 @@ class Harvester extends Component
     }
 
     /**
-     * @param Controller  $instance
+     * @param Controller $instance
      * @param ActionModel $action
      */
     private function updateActionAuthLevel($instance, $action)
@@ -186,7 +194,7 @@ class Harvester extends Component
 
     /**
      * @param yii\base\Module $module
-     * @param string          $route
+     * @param string $route
      *
      * @return ActionModel|null
      * @throws \ReflectionException
@@ -211,6 +219,10 @@ class Harvester extends Component
         return $this->_modules;
     }
 
+    /**
+     * @param \yii\base\Module $module
+     * @return mixed
+     */
     public function getControllers(\yii\base\Module $module)
     {
         return $this->_modules[$module->uniqueId]->controllers;
