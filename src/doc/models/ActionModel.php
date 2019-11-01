@@ -60,9 +60,13 @@ class ActionModel extends Model
         $params   = $instance->getActionParams($this->id) ?: [];
 
         if ($this->authLevel > TokenAuth::AUTH_LEVEL_NONE) {
-            $params = [
-                          'accessToken' => ArrayHelper::getValue($params, 'accessToken'),
-                      ] + $params;
+            $behavior = $instance->getBehavior('authenticator');
+
+            if ($behavior && isset($behavior->accessTokenPath)) {
+                $params = [
+                              $attribute => ArrayHelper::getValue($params, $attribute),
+                          ] + $params;
+            }
         }
 
         return $params;

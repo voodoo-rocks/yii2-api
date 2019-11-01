@@ -12,8 +12,10 @@ use vr\api\components\filters\TokenAuth;
 use vr\api\doc\components\DocAction;
 use Yii;
 use yii\filters\ContentNegotiator;
+use yii\filters\Cors;
 use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\rest\OptionsAction;
 use yii\web\Response;
 
@@ -37,15 +39,26 @@ class Controller extends \yii\rest\Controller
      * @var array
      */
     public $authOptional = [];
+
     /**
      * @var bool
      */
     public $isAtomic = true;
 
     /**
+     * @var
+     */
+    public $requestedAt;
+
+    /**
      * @var bool
      */
-    private $verbose = false;
+    public $includeExecInfo = true;
+
+    /**
+     * @var bool
+     */
+    protected $verbose = false;
 
     /**
      * @return array
@@ -60,10 +73,7 @@ class Controller extends \yii\rest\Controller
                 ],
             ],
             'cors'              => [
-                'class' => \yii\filters\Cors::class,
-            ],
-            'rateLimiter'       => [
-                'class' => RateLimiter::class,
+                'class' => Cors::class,
             ],
             'contentNegotiator' => [
                 'class'   => ContentNegotiator::class,
@@ -77,6 +87,17 @@ class Controller extends \yii\rest\Controller
                 'class' => ApiCheckerFilter::class,
             ],
         ];
+
+        $definitions = \Yii::$app->getComponents(true);
+        $setUp       = ArrayHelper::getValue($definitions, ['user', 'identityClass']);
+
+        if (!empty($setUp)) {
+            $filters = array_merge($filters, [
+                'rateLimiter' => [
+                    'class' => RateLimiter::class,
+                ],
+            ]);
+        }
 
         if (Yii::$app->request->isPost || $this->verbose) {
             $filters = array_merge($filters, [
@@ -103,7 +124,9 @@ class Controller extends \yii\rest\Controller
     {
         $result = parent::afterAction($action, $result);
 
-        if ($this->isAtomic && ($transaction = Yii::$app->db->getTransaction())) {
+        if ($this->isAtomic
+            && Yii::$app->has('db')
+            && ($transaction = Yii::$app->db->getTransaction())) {
             $transaction->commit();
         }
 
@@ -120,17 +143,24 @@ class Controller extends \yii\rest\Controller
      */
     function beforeAction($action)
     {
+        $this->requestedAt = microtime(true);
+
         if (!parent::beforeAction($action)) {
             return false;
         };
 
-        if ($this->isAtomic) {
+        if ($this->isAtomic && Yii::$app->has('db')) {
             Yii::$app->db->beginTransaction();
         }
 
         return true;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return null|ApiAction|DocAction|\yii\base\Action|OptionsAction
+     */
     public function createAction($id)
     {
         if (Yii::$app->request->isOptions) {
@@ -171,31 +201,6 @@ class Controller extends \yii\rest\Controller
 
         return null;
     }
-
-//    /**
-//     * @param array $params
-//     *
-//     * @return array|mixed
-//     * @throws \yii\base\InvalidConfigException
-//     */
-//    public function runWithParams($params)
-//    {
-//        try {
-//            $data = parent::runWithParams($params);
-//
-//            return array_merge(['success' => true], $data ?: []);
-//        } /** @noinspection PhpRedundantCatchClauseInspection */
-//        catch (HttpException $e) {
-//            Yii::$app->response->statusCode = $e->statusCode;
-//
-//            return $this->convertExceptionToArray($e);
-//        } /** @noinspection PhpRedundantCatchClauseInspection */
-//        catch (UserException $e) {
-//            Yii::$app->response->statusCode = $this->validationFailedStatusCode;
-//
-//            return $this->convertExceptionToArray($e);
-//        }
-//    }
 
     /**
      * @param $callable

@@ -8,11 +8,14 @@
 namespace vr\api;
 
 use vr\api\components\Controller;
+use vr\api\components\ErrorHandler;
+use vr\api\components\Response;
 use vr\api\doc\components\Harvester;
 use Yii;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
+use yii\web\JsonResponseFormatter;
 use yii\web\Request;
-use yii\web\Response;
 
 /**
  * Class Module
@@ -25,6 +28,9 @@ use yii\web\Response;
  */
 class Module extends \yii\base\Module
 {
+    /**
+     * @var bool
+     */
     public $hiddenMode = false;
 
     /**
@@ -34,12 +40,7 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        if (\Yii::$container->has('user')) {
-            $user                  = \Yii::$app->user;
-            $user->enableSession   = false;
-            $user->enableAutoLogin = false;
-            $user->loginUrl        = null;
-        }
+        Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
 
         $this->set('harvester', new Harvester());
 
@@ -48,7 +49,7 @@ class Module extends \yii\base\Module
             'doc' => Controller::class,
         ];
 
-        Yii::setAlias('@api', __DIR__ . DIRECTORY_SEPARATOR);
+        $this->setUpUser();
 
         Yii::$app->set('request', [
             'enableCookieValidation' => false,
@@ -60,15 +61,32 @@ class Module extends \yii\base\Module
             ],
         ]);
 
+        (new ErrorHandler())->register();
+
         Yii::$app->set('response', [
-            'class'      => '\yii\web\Response',
+            'class'      => Response::class,
             'formatters' => [
                 Response::FORMAT_JSON => [
-                    'class'         => '\vr\api\components\JsonResponseFormatter',
-                    'prettyPrint'   => YII_DEBUG, // use "pretty" output in debug mode
-                    'encodeOptions' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+                    'class'       => JsonResponseFormatter::class,
+                    'prettyPrint' => true,
                 ],
             ],
         ]);
+    }
+
+    /**
+     *
+     */
+    protected function setUpUser()
+    {
+        $definitions = \Yii::$app->getComponents(true);
+        $setUp       = ArrayHelper::getValue($definitions, ['user', 'identityClass']);
+
+        if (!empty($setUp)) {
+            $user                  = \Yii::$app->user;
+            $user->enableSession   = false;
+            $user->enableAutoLogin = false;
+            $user->loginUrl        = null;
+        }
     }
 }
