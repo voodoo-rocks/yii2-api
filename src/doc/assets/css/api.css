@@ -9,3 +9,13 @@
 .hidden {
   display: none !important;
 }
+
+.bg-white.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background-color: #fff;
+}
+.bg-white.sticky-top .btn-group {
+  margin-top: 4px;
+}
