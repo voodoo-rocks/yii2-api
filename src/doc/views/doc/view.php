@@ -65,7 +65,7 @@ use yii\helpers\Url;
         </div>
 
         <div class="response-wrapper hidden">
-            <div class="row mt-3 bg-white sticky-top">
+            <div class="row mt-3">
                 <div class="col-sm-12">
                     <h4 class="float-left pull-left">
                         Response
