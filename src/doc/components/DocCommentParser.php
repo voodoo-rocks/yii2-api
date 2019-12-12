@@ -48,10 +48,10 @@ class DocCommentParser extends BaseObject
 
         $filtered = array_filter($values, function ($string) {
             return !empty($string)
-                   && strpos($string, '@throws') === false
-                   && strpos($string, '@return') === false;
+                && strpos($string, '@throws') === false
+                && strpos($string, '@return') === false;
         });
 
-        return implode($filtered, '<br/>');
+        return implode('<br/>', $filtered);
     }
 }
