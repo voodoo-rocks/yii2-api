@@ -8,6 +8,8 @@
 
 namespace vr\api\components;
 
+use Error;
+use Exception;
 use vr\core\ErrorsException;
 
 /**
@@ -17,7 +19,7 @@ use vr\core\ErrorsException;
 class ErrorHandler extends \yii\web\ErrorHandler
 {
     /**
-     * @param \Error|\Exception $exception
+     * @param Error|Exception $exception
      *
      * @return array
      */
@@ -29,6 +31,12 @@ class ErrorHandler extends \yii\web\ErrorHandler
             $array += [
                 'data' => $exception->data,
             ];
+
+            if (YII_DEBUG) {
+                $array += [
+                    'trace' => explode("\n", $exception->getTraceAsString())
+                ];
+            }
         }
 
         return $array;
