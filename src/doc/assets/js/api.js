@@ -92,4 +92,16 @@ $(document).ready(function () {
         }
     });
 
+    $('.methods-filter').jSearch({
+        selector  : '.card',
+        child : '.card-header',
+        minValLength: 0,
+        Found : function(elem, event){
+            $(elem).show();
+            $(elem).parent().data('find','true');
+            $(elem).parent().show();
+            $(elem).parent().children('.list-group').children().show()
+        }
+    });
+
 });
