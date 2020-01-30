@@ -68,7 +68,7 @@ class Module extends \yii\base\Module
             'formatters' => [
                 Response::FORMAT_JSON => [
                     'class'         => JsonResponseFormatter::class,
-                    'encodeOptions' => JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE,
+                    'encodeOptions' => JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE,
                     'prettyPrint'   => true,
                 ],
             ],
