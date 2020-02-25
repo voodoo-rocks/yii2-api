@@ -11,7 +11,9 @@ namespace vr\api\components;
 use DateTime;
 use InvalidArgumentException;
 use vr\core\ErrorsException;
+use vr\core\Inflector;
 use Yii;
+use yii\web\JsonResponseFormatter;
 
 /**
  * Class Response
@@ -19,6 +21,22 @@ use Yii;
  */
 class Response extends \yii\web\Response
 {
+    /**
+     * @var bool
+     */
+    public $camelize = false;
+
+    /**
+     * @var array
+     */
+    public $formatters = [
+        Response::FORMAT_JSON => [
+            'class'         => JsonResponseFormatter::class,
+            'encodeOptions' => JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE,
+            'prettyPrint'   => true,
+        ],
+    ];
+
     /**
      *
      */
@@ -37,30 +55,16 @@ class Response extends \yii\web\Response
     }
 
     /**
-     * Sets the response status code based on the exception.
-     *
-     * @param \Exception|\Error $e the exception object.
-     *
-     * @return $this the response object itself
-     * @throws InvalidArgumentException if the status code is invalid.
-     * @since 2.0.12
-     */
-    public function setStatusCodeByException($e)
-    {
-        if ($e instanceof ErrorsException) {
-            return $this->setStatusCode(400);
-        }
-
-        return parent::setStatusCodeByException($e);
-    }
-
-    /**
      * @param Response $response
      */
     protected function handleJsonResponse(Response $response)
     {
         if (!$response->data) {
             $response->data = [];
+        }
+
+        if ($this->camelize) {
+            $response->data = $this->camelize($this->data);
         }
 
         if ($response->isSuccessful) {
@@ -85,5 +89,44 @@ class Response extends \yii\web\Response
                 ],
             ];
         }
+    }
+
+    /**
+     * @param $array
+     * @return mixed
+     */
+    private function camelize($array)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->camelize($value);
+            }
+
+            unset($array[$key]);
+            $key = lcfirst(Inflector::camelize($key));
+
+            $array[$key] = $value;
+        }
+
+        return $array;
+    }
+
+    /**
+     * Sets the response status code based on the exception.
+     *
+     * @param \Exception|\Error $e the exception object.
+     *
+     * @return $this the response object itself
+     * @throws InvalidArgumentException if the status code is invalid.
+     * @since 2.0.12
+     */
+    public function setStatusCodeByException($e)
+    {
+        if ($e instanceof ErrorsException) {
+            return $this->setStatusCode(400);
+        }
+
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return parent::setStatusCodeByException($e);
     }
 }

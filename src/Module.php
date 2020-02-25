@@ -64,13 +64,7 @@ class Module extends \yii\base\Module
         (new ErrorHandler())->register();
 
         Yii::$app->set('response', [
-            'class'      => Response::class,
-            'formatters' => [
-                Response::FORMAT_JSON => [
-                    'class'       => JsonResponseFormatter::class,
-                    'prettyPrint' => true,
-                ],
-            ],
+            'class' => Response::class,
         ]);
     }
 
@@ -79,11 +73,11 @@ class Module extends \yii\base\Module
      */
     protected function setUpUser()
     {
-        $definitions = \Yii::$app->getComponents(true);
+        $definitions = Yii::$app->getComponents(true);
         $setUp       = ArrayHelper::getValue($definitions, ['user', 'identityClass']);
 
         if (!empty($setUp)) {
-            $user                  = \Yii::$app->user;
+            $user                  = Yii::$app->user;
             $user->enableSession   = false;
             $user->enableAutoLogin = false;
             $user->loginUrl        = null;

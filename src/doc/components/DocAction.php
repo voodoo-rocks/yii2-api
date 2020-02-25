@@ -67,7 +67,7 @@ class DocAction extends Action
     private function render($view, $params)
     {
         $currentView = Yii::$app->getView();
-        $title       = ArrayHelper::getValue($params, ['model', 'label']);
+        $title       = ArrayHelper::getValue($params, ['model', 'route']);
 
         $currentView->title = trim("{$title} | " . Yii::$app->name, ' |');
 

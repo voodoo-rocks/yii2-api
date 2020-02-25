@@ -8,11 +8,15 @@
 
 namespace vr\api\components\filters;
 
+use Yii;
 use yii\base\Action;
 use yii\filters\auth\AuthMethod;
 use yii\helpers\ArrayHelper;
+use yii\web\IdentityInterface;
+use yii\web\Request;
 use yii\web\Response;
 use yii\web\UnauthorizedHttpException;
+use yii\web\User;
 
 /**
  * Class TokenAuth
@@ -24,27 +28,23 @@ class TokenAuth extends AuthMethod
      *
      */
     const DEFAULT_TOKEN_PATH = 'accessToken';
-
     /**
      *
      */
     const DEFAULT_TOKEN_HEADER = 'X-Access-Token';
-
     /**
      *
      */
     const AUTH_LEVEL_REQUIRED = 1;
-
     /**
      *
      */
     const AUTH_LEVEL_OPTIONAL = 0;
-
     /**
      *
      */
     const AUTH_LEVEL_NONE = -1;
-
+    public $type;
     /**
      * @var string
      */
@@ -63,11 +63,11 @@ class TokenAuth extends AuthMethod
     /**
      * Authenticates the current user.
      *
-     * @param \yii\web\User     $user
-     * @param \yii\web\Request  $request
-     * @param \yii\web\Response $response
+     * @param User $user
+     * @param Request $request
+     * @param Response $response
      *
-     * @return \yii\web\IdentityInterface the authenticated user identity. If authentication information is not
+     * @return IdentityInterface the authenticated user identity. If authentication information is not
      *                                    provided, null will be returned.
      * @throws UnauthorizedHttpException if authentication information is provided but is invalid.
      */
@@ -80,33 +80,21 @@ class TokenAuth extends AuthMethod
             $token = $request->headers->get($this->accessTokenHeader);
         }
 
-        $level = $this->getAuthLevel(\Yii::$app->requestedAction);
+        $level = $this->getAuthLevel(Yii::$app->requestedAction);
 
-        if (!\Yii::$app->user->isGuest) {
-            \Yii::$app->user->logout();
+        if (!Yii::$app->user->isGuest) {
+            Yii::$app->user->logout();
         }
 
         if ($level > self::AUTH_LEVEL_NONE && !empty($token)) {
-            $identity = $user->loginByAccessToken($token);
+            $identity = $user->loginByAccessToken($token, $this->type);
 
             if ($level !== self::AUTH_LEVEL_NONE && !$identity) {
                 throw new UnauthorizedHttpException('Incorrect or expired token provided');
-            };
+            }
         }
 
         return $identity;
-    }
-
-    /**
-     * @param $response
-     *
-     * @throws UnauthorizedHttpException
-     */
-    public function handleFailure($response)
-    {
-        if ($response->format != Response::FORMAT_HTML) {
-            parent::handleFailure($response);
-        }
     }
 
     /**
@@ -121,6 +109,18 @@ class TokenAuth extends AuthMethod
         }
 
         return $this->isActive($action) ? self::AUTH_LEVEL_REQUIRED : self::AUTH_LEVEL_NONE;
+    }
+
+    /**
+     * @param $response
+     *
+     * @throws UnauthorizedHttpException
+     */
+    public function handleFailure($response)
+    {
+        if ($response->format != Response::FORMAT_HTML) {
+            parent::handleFailure($response);
+        }
     }
 
     protected function getActionId($action)
