@@ -14,6 +14,8 @@ use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
 use yii\filters\Cors;
 use yii\filters\RateLimiter;
@@ -111,10 +113,18 @@ class Controller extends \yii\rest\Controller
         if (Yii::$app->request->isPost || $this->verbose) {
             $filters = array_merge($filters, [
                 'authenticator' => [
-                    'class'    => TokenAuth::class,
-                    'except'   => $this->authExcept,
-                    'only'     => $this->authOnly,
-                    'optional' => $this->authOptional,
+                    'class'       => CompositeAuth::class,
+                    'authMethods' => [
+                        [
+                            'class'    => TokenAuth::class,
+                            'except'   => $this->authExcept,
+                            'only'     => $this->authOnly,
+                            'optional' => $this->authOptional,
+                        ],
+                        [
+                            'class' => HttpBearerAuth::class,
+                        ]
+                    ]
                 ],
             ]);
         }
