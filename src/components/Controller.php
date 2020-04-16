@@ -114,12 +114,12 @@ class Controller extends \yii\rest\Controller
             $filters = array_merge($filters, [
                 'authenticator' => [
                     'class'       => CompositeAuth::class,
+                    'except'      => $this->authExcept,
+                    'only'        => $this->authOnly,
+                    'optional'    => $this->authOptional,
                     'authMethods' => [
                         [
-                            'class'    => TokenAuth::class,
-                            'except'   => $this->authExcept,
-                            'only'     => $this->authOnly,
-                            'optional' => $this->authOptional,
+                            'class' => TokenAuth::class,
                         ],
                         [
                             'class' => HttpBearerAuth::class,
