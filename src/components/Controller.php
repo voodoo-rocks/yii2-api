@@ -14,6 +14,7 @@ use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use yii\db\Transaction;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
@@ -169,7 +170,7 @@ class Controller extends \yii\rest\Controller
         }
 
         if ($this->isAtomic && Yii::$app->has('db')) {
-            Yii::$app->db->beginTransaction();
+            Yii::$app->db->beginTransaction(Transaction::READ_COMMITTED);
         }
 
         return true;
