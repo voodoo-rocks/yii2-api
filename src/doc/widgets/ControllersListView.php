@@ -31,7 +31,8 @@ class ControllersListView extends Widget
     {
         return ListView::widget([
             'dataProvider' => new ArrayDataProvider([
-                'allModels' => $this->models,
+                'allModels'  => $this->models,
+                'pagination' => false,
             ]),
             'layout'       => '{items}',
             'itemView'     => '@api/doc/widgets/views/controller-list-item-view',
