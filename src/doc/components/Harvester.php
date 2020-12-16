@@ -8,6 +8,8 @@
 
 namespace vr\api\doc\components;
 
+use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 use vr\api\components\Controller;
 use vr\api\components\filters\TokenAuth;
@@ -18,6 +20,7 @@ use vr\core\Inflector;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\Module;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
@@ -35,11 +38,11 @@ class Harvester extends Component
     private $_modules = [];
 
     /**
-     * @param yii\base\Module $root
+     * @param Module $root
      * @param string $path
      *
      * @return array
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function fetchModules($root = null, $path = null)
     {
@@ -68,10 +71,10 @@ class Harvester extends Component
     }
 
     /**
-     * @param yii\base\Module $module
+     * @param Module $module
      *
      * @return array
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function fetchControllers($module)
     {
@@ -84,7 +87,7 @@ class Harvester extends Component
             ]);
         }
 
-        $files = FileHelper::findFiles($module->controllerPath, ['only' => ['*Controller.php']]);
+        $files = FileHelper::findFiles(Yii::getAlias($module->controllerPath), ['only' => ['*Controller.php']]);
 
         foreach ($files as $file) {
             $class = pathinfo($file, PATHINFO_FILENAME);
@@ -102,7 +105,7 @@ class Harvester extends Component
             if (!$this->fetchActions($controller)) {
                 unset($controllers[$index]);
                 continue;
-            };
+            }
 
             if ($controller->isActive) {
                 unset($controllers[$index]);
@@ -116,18 +119,18 @@ class Harvester extends Component
     /**
      * @param ControllerModel $controller
      * @return int
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function fetchActions(ControllerModel $controller)
     {
         try {
             /** @var Controller $instance */
-            list($instance) = \Yii::$app->createController($controller->route);
+            list($instance) = Yii::$app->createController($controller->route);
         } catch (InvalidConfigException $exception) {
             return 0;
         }
 
-        $reflection = new \ReflectionClass($instance);
+        $reflection = new ReflectionClass($instance);
 
         /** @var VerbFilter $filter */
         $filter = ArrayHelper::getValue($instance->behaviors(), 'verbs');
@@ -193,11 +196,11 @@ class Harvester extends Component
     }
 
     /**
-     * @param yii\base\Module $module
+     * @param Module $module
      * @param string $route
      *
      * @return ActionModel|null
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function findAction($module, $route)
     {
@@ -220,10 +223,10 @@ class Harvester extends Component
     }
 
     /**
-     * @param \yii\base\Module $module
+     * @param Module $module
      * @return mixed
      */
-    public function getControllers(\yii\base\Module $module)
+    public function getControllers(Module $module)
     {
         return $this->_modules[$module->uniqueId]->controllers;
     }
