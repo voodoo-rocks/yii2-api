@@ -11,12 +11,19 @@ use vr\api\components\filters\ApiCheckerFilter;
 use vr\api\components\filters\TokenAuth;
 use vr\api\doc\components\DocAction;
 use Yii;
+use yii\base\Action;
+use yii\base\InvalidConfigException;
+use yii\db\Exception;
+use yii\db\Transaction;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
 use yii\filters\Cors;
 use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\rest\OptionsAction;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -61,6 +68,11 @@ class Controller extends \yii\rest\Controller
     protected $verbose = false;
 
     /**
+     * @var bool
+     */
+    private $docsEnabled = YII_DEBUG;
+
+    /**
      * @return array
      */
     public function behaviors()
@@ -88,7 +100,7 @@ class Controller extends \yii\rest\Controller
             ],
         ];
 
-        $definitions = \Yii::$app->getComponents(true);
+        $definitions = Yii::$app->getComponents(true);
         $setUp       = ArrayHelper::getValue($definitions, ['user', 'identityClass']);
 
         if (!empty($setUp)) {
@@ -102,10 +114,18 @@ class Controller extends \yii\rest\Controller
         if (Yii::$app->request->isPost || $this->verbose) {
             $filters = array_merge($filters, [
                 'authenticator' => [
-                    'class'    => TokenAuth::class,
-                    'except'   => $this->authExcept,
-                    'only'     => $this->authOnly,
-                    'optional' => $this->authOptional,
+                    'class'       => CompositeAuth::class,
+                    'except'      => $this->authExcept,
+                    'only'        => $this->authOnly,
+                    'optional'    => $this->authOptional,
+                    'authMethods' => [
+                        [
+                            'class' => TokenAuth::class,
+                        ],
+                        [
+                            'class' => HttpBearerAuth::class,
+                        ]
+                    ]
                 ],
             ]);
         }
@@ -114,11 +134,11 @@ class Controller extends \yii\rest\Controller
     }
 
     /**
-     * @param \yii\base\Action $action
-     * @param mixed            $result
+     * @param Action $action
+     * @param mixed $result
      *
      * @return mixed
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     public function afterAction($action, $result)
     {
@@ -136,10 +156,10 @@ class Controller extends \yii\rest\Controller
     /**
      * Makes necessary preparation before the action. In this case it sets up the appropriate response format
      *
-     * @param \yii\base\Action $action
+     * @param Action $action
      *
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
      */
     function beforeAction($action)
     {
@@ -147,45 +167,20 @@ class Controller extends \yii\rest\Controller
 
         if (!parent::beforeAction($action)) {
             return false;
-        };
+        }
 
         if ($this->isAtomic && Yii::$app->has('db')) {
-            Yii::$app->db->beginTransaction();
+            Yii::$app->db->beginTransaction(Transaction::READ_COMMITTED);
         }
 
         return true;
     }
 
     /**
-     * @param string $id
-     *
-     * @return null|ApiAction|DocAction|\yii\base\Action|OptionsAction
-     */
-    public function createAction($id)
-    {
-        if (Yii::$app->request->isOptions) {
-            return new OptionsAction($id, $this);
-        }
-
-        if (Yii::$app->request->isGet && !$this->verbose) {
-            return new DocAction($this->uniqueId . '/' . $id, $this);
-        }
-
-        if (Yii::$app->request->isPost) {
-            $methodName = 'action' . str_replace(' ', '',
-                    ucwords(str_replace('-', ' ', $id)));
-
-            return new ApiAction($id, $this, $methodName);
-        }
-
-        return parent::createAction($id);
-    }
-
-    /**
      * @param $action
      *
      * @return null|array
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getActionParams($action)
     {
@@ -200,6 +195,31 @@ class Controller extends \yii\rest\Controller
         }
 
         return null;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return null|ApiAction|DocAction|Action|OptionsAction
+     */
+    public function createAction($id)
+    {
+        if (Yii::$app->request->isOptions) {
+            return new OptionsAction($id, $this);
+        }
+
+        if (Yii::$app->request->isGet && $this->docsEnabled && !$this->verbose) {
+            return new DocAction($this->uniqueId . '/' . $id, $this);
+        }
+
+        if (Yii::$app->request->isPost) {
+            $methodName = 'action' . str_replace(' ', '',
+                    ucwords(str_replace('-', ' ', $id)));
+
+            return new ApiAction($id, $this, $methodName);
+        }
+
+        return parent::createAction($id);
     }
 
     /**

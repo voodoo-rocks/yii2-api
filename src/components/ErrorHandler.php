@@ -8,7 +8,10 @@
 
 namespace vr\api\components;
 
+use Error;
+use Exception;
 use vr\core\ErrorsException;
+use Yii;
 
 /**
  * Class ErrorHandler
@@ -17,7 +20,12 @@ use vr\core\ErrorsException;
 class ErrorHandler extends \yii\web\ErrorHandler
 {
     /**
-     * @param \Error|\Exception $exception
+     * @var int
+     */
+    public $errorStatusCode = 400;
+
+    /**
+     * @param Error|Exception $exception
      *
      * @return array
      */
@@ -26,9 +34,17 @@ class ErrorHandler extends \yii\web\ErrorHandler
         $array = parent::convertExceptionToArray($exception);
 
         if ($exception instanceof ErrorsException) {
+            Yii::$app->response->statusCode = $this->errorStatusCode;
+
             $array += [
                 'data' => $exception->data,
             ];
+
+            if (YII_DEBUG) {
+                $array += [
+                    'trace' => explode("\n", $exception->getTraceAsString())
+                ];
+            }
         }
 
         return $array;

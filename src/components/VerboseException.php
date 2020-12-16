@@ -17,14 +17,14 @@ use yii\base\Exception;
 class VerboseException extends Exception
 {
     /**
-     * @var
+     * @var array
      */
     public $params;
 
     /**
      * VerboseException constructor.
      *
-     * @param string $params
+     * @param array $params
      */
     public function __construct($params)
     {
