@@ -7,14 +7,14 @@
 
 namespace vr\api\components;
 
-use vr\api\components\filters\ApiCheckerFilter;
+use Exception;
+use vr\api\components\filters\ExecutionInfoFilter;
 use vr\api\components\filters\TokenAuth;
 use vr\api\doc\components\DocAction;
+use vr\core\components\TransactionalBehavior;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
-use yii\db\Exception;
-use yii\db\Transaction;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\ContentNegotiator;
@@ -23,7 +23,6 @@ use yii\filters\RateLimiter;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\rest\OptionsAction;
-use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 /**
@@ -50,17 +49,7 @@ class Controller extends \yii\rest\Controller
     /**
      * @var bool
      */
-    public $isAtomic = true;
-
-    /**
-     * @var
-     */
-    public $requestedAt;
-
-    /**
-     * @var bool
-     */
-    public $includeExecInfo = true;
+    public $docsEnabled = YII_DEBUG;
 
     /**
      * @var bool
@@ -68,14 +57,10 @@ class Controller extends \yii\rest\Controller
     protected $verbose = false;
 
     /**
-     * @var bool
-     */
-    private $docsEnabled = YII_DEBUG;
-
-    /**
      * @return array
+     * @throws Exception
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         $filters = [
             'verbs'             => [
@@ -87,6 +72,9 @@ class Controller extends \yii\rest\Controller
             'cors'              => [
                 'class' => Cors::class,
             ],
+            'info'              => [
+                'class' => ExecutionInfoFilter::class,
+            ],
             'contentNegotiator' => [
                 'class'   => ContentNegotiator::class,
                 'formats' => [
@@ -95,15 +83,14 @@ class Controller extends \yii\rest\Controller
                     'text/html'        => Response::FORMAT_HTML,
                 ],
             ],
-            'apiChecker'        => [
-                'class' => ApiCheckerFilter::class,
-            ],
+            'transactional'     => [
+                'class' => TransactionalBehavior::class,
+            ]
         ];
 
         $definitions = Yii::$app->getComponents(true);
-        $setUp       = ArrayHelper::getValue($definitions, ['user', 'identityClass']);
 
-        if (!empty($setUp)) {
+        if (ArrayHelper::getValue($definitions, ['user', 'identityClass'])) {
             $filters = array_merge($filters, [
                 'rateLimiter' => [
                     'class' => RateLimiter::class,
@@ -111,6 +98,7 @@ class Controller extends \yii\rest\Controller
             ]);
         }
 
+        // TODO: refactor
         if (Yii::$app->request->isPost || $this->verbose) {
             $filters = array_merge($filters, [
                 'authenticator' => [
@@ -134,55 +122,12 @@ class Controller extends \yii\rest\Controller
     }
 
     /**
-     * @param Action $action
-     * @param mixed $result
-     *
-     * @return mixed
-     * @throws Exception
-     */
-    public function afterAction($action, $result)
-    {
-        $result = parent::afterAction($action, $result);
-
-        if ($this->isAtomic
-            && Yii::$app->has('db')
-            && ($transaction = Yii::$app->db->getTransaction())) {
-            $transaction->commit();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Makes necessary preparation before the action. In this case it sets up the appropriate response format
-     *
-     * @param Action $action
-     *
-     * @return bool
-     * @throws BadRequestHttpException
-     */
-    function beforeAction($action)
-    {
-        $this->requestedAt = microtime(true);
-
-        if (!parent::beforeAction($action)) {
-            return false;
-        }
-
-        if ($this->isAtomic && Yii::$app->has('db')) {
-            Yii::$app->db->beginTransaction(Transaction::READ_COMMITTED);
-        }
-
-        return true;
-    }
-
-    /**
      * @param $action
      *
      * @return null|array
      * @throws InvalidConfigException
      */
-    public function getActionParams($action)
+    public function getActionParams($action): ?array
     {
         $this->verbose = true;
         $action        = $this->createAction($action);
@@ -191,7 +136,7 @@ class Controller extends \yii\rest\Controller
             $action->runWithParams([]);
         } /** @noinspection PhpRedundantCatchClauseInspection */
         catch (VerboseException $exception) {
-            return $exception->params;
+            return YII_DEBUG ? $exception->params : $this->anonymizeParams($exception->params);
         }
 
         return null;
@@ -201,6 +146,7 @@ class Controller extends \yii\rest\Controller
      * @param string $id
      *
      * @return null|ApiAction|DocAction|Action|OptionsAction
+     * @noinspection PhpMissingParamTypeInspection
      */
     public function createAction($id)
     {
@@ -223,12 +169,35 @@ class Controller extends \yii\rest\Controller
     }
 
     /**
+     * @param array|object|null $params
+     * @return null
+     */
+    private function anonymizeParams(?array $params): ?array
+    {
+        if ($params === null) {
+            return null;
+        }
+
+        if (is_array($params)) {
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    $params[$key] = $this->anonymizeParams($value);
+                } else {
+                    $params[$key] = null;
+                }
+            }
+        }
+
+        return $params;
+    }
+
+    /**
      * @param $callable
      *
      * @return bool
      * @throws VerboseException
      */
-    protected function checkInputParams($callable = null)
+    protected function checkInputParams($callable = null): bool
     {
         if ($this->verbose) {
             $params = [];

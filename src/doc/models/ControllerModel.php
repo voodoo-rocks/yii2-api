@@ -36,7 +36,7 @@ class ControllerModel extends Model
      *
      * @return null|ActionModel
      */
-    public function findAction($route)
+    public function findAction($route): ?ActionModel
     {
         /** @var ActionModel $action */
         foreach ($this->actions as $action) {
@@ -51,12 +51,12 @@ class ControllerModel extends Model
     /**
      * @return bool
      */
-    public function getIsActive()
+    public function getIsActive(): bool
     {
         foreach ($this->actions as $action) {
             if ($action->isActive) {
                 return true;
-            };
+            }
         }
 
         return false;

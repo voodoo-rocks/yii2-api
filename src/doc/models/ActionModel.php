@@ -8,19 +8,21 @@
 
 namespace vr\api\doc\models;
 
+use Exception;
 use vr\api\components\Controller;
-use vr\api\components\filters\TokenAuth;
+use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class Action
  * @package vr\api\doc\models
- * @property bool   requiresAuthentication
- * @property bool   $authLevel
+ * @property bool requiresAuthentication
+ * @property bool $authLevel
  * @property string $id
- * @property array  $inputParams
- * @property bool   isActive
+ * @property array $inputParams
+ * @property bool isActive
  */
 class ActionModel extends Model
 {
@@ -51,25 +53,14 @@ class ActionModel extends Model
 
     /**
      * @return array
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
-    public function getInputParams()
+    public function getInputParams(): array
     {
         /** @var Controller $instance */
-        $instance = \Yii::$app->controller;
-        $params   = $instance->getActionParams($this->id) ?: [];
+        $instance = Yii::$app->controller;
 
-        if ($this->authLevel > TokenAuth::AUTH_LEVEL_NONE) {
-            $behavior = $instance->getBehavior('authenticator');
-
-            if ($behavior && isset($behavior->accessTokenPath)) {
-                $params = [
-                              $attribute => ArrayHelper::getValue($params, $attribute),
-                          ] + $params;
-            }
-        }
-
-        return $params;
+        return $instance->getActionParams($this->id) ?: [];
     }
 
     /**
@@ -77,11 +68,12 @@ class ActionModel extends Model
      */
     public function getIsActive()
     {
-        return \Yii::$app->requestedRoute == $this->route;
+        return Yii::$app->requestedRoute == $this->route;
     }
 
     /**
      * @return mixed
+     * @throws Exception
      */
     public function getId()
     {
