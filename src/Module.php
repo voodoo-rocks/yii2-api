@@ -14,7 +14,6 @@ use vr\api\doc\components\Harvester;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
-use yii\web\JsonResponseFormatter;
 use yii\web\Request;
 
 /**
@@ -31,7 +30,12 @@ class Module extends \yii\base\Module
     /**
      * @var bool
      */
-    public $hiddenMode = false;
+    public $docEnabled = YII_DEBUG;
+
+    /**
+     * @var bool
+     */
+    public $purifyDoc = true || !YII_DEBUG;
 
     /**
      * @throws Exception

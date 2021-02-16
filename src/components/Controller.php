@@ -204,11 +204,27 @@ class Controller extends \yii\rest\Controller
 
             if ($callable) {
                 $params = call_user_func($callable);
+                /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+                if (@$this->module->purifyDoc) {
+                    $params = $this->purify($params);
+                }
             }
 
             throw new VerboseException($params);
         }
 
         return true;
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
+    private function purify(array $params): array
+    {
+        foreach ($params as $key => $value) {
+            $params[$key] = is_array($value) ? $this->purify($value) : null;
+        }
+        return $params;
     }
 }
