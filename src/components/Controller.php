@@ -49,11 +49,6 @@ class Controller extends \yii\rest\Controller
     /**
      * @var bool
      */
-    public $docsEnabled = YII_DEBUG;
-
-    /**
-     * @var bool
-     */
     protected $verbose = false;
 
     /**
@@ -154,7 +149,7 @@ class Controller extends \yii\rest\Controller
             return new OptionsAction($id, $this);
         }
 
-        if (Yii::$app->request->isGet && $this->docsEnabled && !$this->verbose) {
+        if (Yii::$app->request->isGet && !$this->verbose) {
             return new DocAction($this->uniqueId . '/' . $id, $this);
         }
 

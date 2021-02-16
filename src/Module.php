@@ -35,7 +35,7 @@ class Module extends \yii\base\Module
     /**
      * @var bool
      */
-    public $purifyDoc = true || !YII_DEBUG;
+    public $purifyDoc = !YII_DEBUG;
 
     /**
      * @throws Exception
