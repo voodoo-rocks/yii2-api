@@ -53,9 +53,14 @@ class MetaSupportFilter extends ActionFilter
             }
 
             foreach ($this->db as $db) {
-                Yii::$app->get($db)->createCommand('set @@session.time_zone = :timezone', [
-                    ':timezone' => $timezone,
-                ])->execute();
+                $connection = Yii::$app->get($db);
+
+                $command = ArrayHelper::getValue([
+                    'mysql' => 'set @@session.time_zone = "{0}"',
+                    'pgsql' => 'set session time zone "{0}"',
+                ], $connection->driverName);
+
+                $connection->createCommand(Yii::t('app', $command, [$timezone]))->execute();
             }
         }
 
