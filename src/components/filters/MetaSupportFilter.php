@@ -29,7 +29,7 @@ class MetaSupportFilter extends ActionFilter
     /**
      * @var string
      */
-    public $language = 'language';
+    public $language = 'locale';
 
     /**
      * @param Action $action
