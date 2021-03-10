@@ -8,11 +8,12 @@
 
 namespace vr\api\components;
 
-use DateTime;
+use Error;
+use Exception;
 use InvalidArgumentException;
 use vr\core\ErrorsException;
 use vr\core\Inflector;
-use Yii;
+use vr\core\utils\HttpCode;
 use yii\web\JsonResponseFormatter;
 
 /**
@@ -75,20 +76,6 @@ class Response extends \yii\web\Response
                 'exception' => $response->data,
             ];
         }
-
-        /** @var Controller $controller */
-        $controller = Yii::$app->controller;
-        if ($controller->includeExecInfo) {
-            $response->data += [
-                '_execution' => [
-                    'responseCode'   => $response->statusCode,
-                    'responseStatus' => $response->statusText,
-                    'timestamp'      => DateTime::createFromFormat('U', (int)$controller->requestedAt)
-                        ->format('Y-m-d H:i:s'),
-                    'executionTime'  => round(microtime(true) - $controller->requestedAt, 3),
-                ],
-            ];
-        }
     }
 
     /**
@@ -114,19 +101,18 @@ class Response extends \yii\web\Response
     /**
      * Sets the response status code based on the exception.
      *
-     * @param \Exception|\Error $e the exception object.
+     * @param Exception|Error $e the exception object.
      *
      * @return $this the response object itself
      * @throws InvalidArgumentException if the status code is invalid.
      * @since 2.0.12
      */
-    public function setStatusCodeByException($e)
+    public function setStatusCodeByException($e): Response
     {
         if ($e instanceof ErrorsException) {
-            return $this->setStatusCode(400);
+            return $this->setStatusCode(HttpCode::BAD_REQUEST);
         }
 
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return parent::setStatusCodeByException($e);
     }
 }

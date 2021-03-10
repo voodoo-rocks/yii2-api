@@ -8,9 +8,13 @@
 
 namespace vr\api\doc\components;
 
+use ReflectionException;
 use Yii;
 use yii\base\Action;
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * Class DocAction
@@ -29,17 +33,23 @@ class DocAction extends Action
     public $layout = '@api/doc/views/layouts/main';
 
     /**
-     * @return string|\yii\web\Response
-     * @throws \yii\base\InvalidConfigException
-     * @throws \ReflectionException
+     * @return string|Response
+     * @throws InvalidConfigException
+     * @throws ReflectionException
+     * @throws NotFoundHttpException
      */
     public function run()
     {
         $route = Yii::$app->requestedRoute;
 
+        $module = Yii::$app->controller->module;
+        if (!@$module->docEnabled) {
+            // TODO: probably move to routing
+            throw new NotFoundHttpException();
+        }
+
         /** @var Harvester $harvester */
         $harvester = Yii::$app->controller->module->get('harvester');
-        $module    = \Yii::$app->controller->module;
         $action    = $harvester->findAction($module, $route);
 
         $harvester->fetchModules();
