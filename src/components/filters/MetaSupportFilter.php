@@ -4,6 +4,7 @@
 namespace vr\api\components\filters;
 
 
+use Exception;
 use Yii;
 use yii\base\Action;
 use yii\base\ActionFilter;
@@ -32,22 +33,25 @@ class MetaSupportFilter extends ActionFilter
     public $language = 'locale';
 
     /**
+     * @var string
+     */
+    public $defaultTimezone = null;
+
+    /**
      * @param Action $action
      * @return bool
      * @throws InvalidConfigException
-     * @noinspection PhpMissingParamTypeInspection
+     * @throws Exception
      */
     public function beforeAction($action): bool
     {
-        if (!($beforeAction = parent::beforeAction($action))) {
+        if (!parent::beforeAction($action)) {
             return false;
         }
 
-        if (!($meta = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'meta'))) {
-            return true;
-        }
+        $meta = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'meta');
 
-        if ($timezone = ArrayHelper::getValue($meta, $this->timezone)) {
+        if ($timezone = ArrayHelper::getValue($meta, $this->timezone) ?: $this->defaultTimezone) {
             if (!is_array($this->db)) {
                 $this->db = [$this->db];
             }
