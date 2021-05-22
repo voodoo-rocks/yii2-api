@@ -5,6 +5,7 @@ namespace vr\api\components\filters;
 
 
 use Exception;
+use Throwable;
 use Yii;
 use yii\base\Action;
 use yii\base\ActionFilter;
@@ -65,6 +66,11 @@ class MetaSupportFilter extends ActionFilter
                 ], $connection->driverName);
 
                 $connection->createCommand(Yii::t('app', $command, [$timezone]))->execute();
+            }
+
+            try {
+                date_default_timezone_set($timezone);
+            } catch (Throwable $throwable) {
             }
         }
 
