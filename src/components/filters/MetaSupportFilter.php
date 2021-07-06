@@ -65,7 +65,11 @@ class MetaSupportFilter extends ActionFilter
                     'pgsql' => 'set session time zone "{0}"',
                 ], $connection->driverName);
 
-                $connection->createCommand($command, [$timezone])->execute();
+                $command = strtr($command, [
+                    '{0}' => $timezone
+                ]);
+
+                $connection->createCommand($command)->execute();
             }
 
             try {
