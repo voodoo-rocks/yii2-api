@@ -60,7 +60,7 @@ class MetaSupportFilter extends ActionFilter
                     'pgsql' => 'set session time zone "{0}"',
                 ], $connection->driverName);
 
-                $connection->createCommand(Yii::t('app', $command, [$timezone]))->execute();
+                $connection->createCommand($command, [$timezone])->execute();
             }
         }
 
