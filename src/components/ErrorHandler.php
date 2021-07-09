@@ -12,6 +12,7 @@ use Error;
 use Exception;
 use vr\core\ErrorsException;
 use Yii;
+use yii\base\UserException;
 
 /**
  * Class ErrorHandler
@@ -24,6 +25,11 @@ class ErrorHandler extends \yii\web\ErrorHandler
      */
     public $errorStatusCode = 400;
 
+    public $includeExceptions = [
+        ErrorsException::class,
+        UserException::class,
+    ];
+
     /**
      * @param Error|Exception $exception
      *
@@ -33,20 +39,23 @@ class ErrorHandler extends \yii\web\ErrorHandler
     {
         $array = parent::convertExceptionToArray($exception);
 
-        if ($exception instanceof ErrorsException) {
-            Yii::$app->response->statusCode = $this->errorStatusCode;
+        foreach ($this->includeExceptions as $class) {
+            if (get_class($exception) === $class) {
+                Yii::$app->response->statusCode = $this->errorStatusCode;
 
-            $array += [
-                'data' => $exception->data,
-            ];
-
-            if (YII_DEBUG) {
                 $array += [
-                    'trace' => explode("\n", $exception->getTraceAsString())
+                    'data' => @$exception->data,
                 ];
+
+                if (YII_DEBUG) {
+                    $array += [
+                        'trace' => explode("\n", $exception->getTraceAsString())
+                    ];
+                }
+
+                break;
             }
         }
-
         return $array;
     }
 }
