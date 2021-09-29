@@ -10,6 +10,7 @@ use Yii;
 use yii\base\Action;
 use yii\base\ActionFilter;
 use yii\base\InvalidConfigException;
+use yii\db\Connection;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -58,18 +59,24 @@ class MetaSupportFilter extends ActionFilter
             }
 
             foreach ($this->db as $db) {
+                /** @var Connection $connection */
                 $connection = Yii::$app->get($db);
 
                 $command = ArrayHelper::getValue([
-                    'mysql' => 'set @@session.time_zone = "{0}"',
-                    'pgsql' => 'set session time zone "{0}"',
-                ], $connection->driverName);
+                    'mysql' => function ($timezone) {
+                        return strtr('set @@session.time_zone = "{0}"', ['{0}' => $timezone]);
+                    },
+                    'pgsql' => function ($timezone) {
+                        if (count($parts = explode(':',$timezone)) > 1) {
+                            $timezone = (int)$parts[1] * 60 + (int)$parts[0];
+                        }
+                        return strtr('set session time zone "{0}"', ['{0}' => $timezone]);
+                    },
+                ], $connection->driverName, fn() => null);
 
-                $command = strtr($command, [
-                    '{0}' => $timezone
-                ]);
-
-                $connection->createCommand($command)->execute();
+                if ($command = call_user_func($command, $timezone)) {
+                    $connection->createCommand($command)->execute();
+                }
             }
 
             try {
